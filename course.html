@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>晓晓老师的不冒失修炼课</title>
+<style>
+  :root{
+    --bg1:#fef6e4; --bg2:#e8f0fe; --chalk:#2b3a55; --board:#33485e;
+    --teacher:#ff8a65; --student:#4fc3f7; --ink:#23314f; --soft:#5b6b8c;
+    --good:#33b679; --bad:#ef5350; --gold:#ffb300;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+    background:linear-gradient(160deg,var(--bg1),var(--bg2));
+    color:var(--ink);display:flex;flex-direction:column;min-height:100vh;
+  }
+  header{
+    background:var(--board);color:#fff;padding:14px 18px;display:flex;
+    align-items:center;gap:14px;flex-wrap:wrap;box-shadow:0 4px 14px rgba(0,0,0,.18);
+    position:sticky;top:0;z-index:5;
+  }
+  header h1{font-size:19px;letter-spacing:1px;display:flex;align-items:center;gap:8px}
+  .badge{background:var(--gold);color:#5a4500;font-size:12px;padding:2px 9px;border-radius:20px;font-weight:700}
+  .progress-wrap{flex:1;min-width:160px;display:flex;align-items:center;gap:8px}
+  .progress{flex:1;height:9px;background:#ffffff33;border-radius:20px;overflow:hidden}
+  .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffd54f,#ff8a65);transition:width .4s}
+  .score{background:#ffffff22;padding:4px 10px;border-radius:20px;font-size:13px;white-space:nowrap}
+  main{flex:1;display:flex;flex-direction:column;padding:18px 16px 8px;max-width:920px;width:100%;margin:0 auto}
+  .stage{
+    flex:1;background:#fff;border-radius:18px;box-shadow:0 8px 26px rgba(60,80,120,.14);
+    padding:18px;display:flex;flex-direction:column;gap:14px;min-height:300px;position:relative;overflow:hidden;
+  }
+  .stage::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% -10%,#fff3e0,transparent 55%);pointer-events:none}
+  .row{display:flex;gap:12px;align-items:flex-end;z-index:1}
+  .row.student{flex-direction:row-reverse}
+  .avatar{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:24px;font-weight:800;color:#fff;flex:0 0 auto;box-shadow:0 4px 10px rgba(0,0,0,.15)}
+  .avatar.teacher{background:linear-gradient(135deg,#ffb74d,#ff7043)}
+  .avatar.student{background:linear-gradient(135deg,#4fc3f7,#0288d1)}
+  .bubble{max-width:75%;background:#f4f7fb;border:1px solid #e4ebf5;border-radius:16px;padding:12px 15px;
+    line-height:1.7;font-size:16px;position:relative;animation:pop .35s ease}
+  .row.student .bubble{background:#e3f2fd;border-color:#cfe8fb}
+  .name{font-size:12px;color:var(--soft);margin:0 4px 4px;font-weight:700}
+  @keyframes pop{from{transform:translateY(8px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+  .typing{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--soft);margin-left:3px;animation:blink 1s infinite}
+  @keyframes blink{0%,100%{opacity:.2}50%{opacity:1}}
+
+  /* 底部字幕条：不遮挡上方讲解区 */
+  .caption{
+    margin:12px auto 0;max-width:920px;width:100%;padding:0 16px;
+  }
+  .caption-bar{
+    background:rgba(35,49,79,.92);color:#fff;border-radius:14px;padding:12px 16px;font-size:15px;line-height:1.6;
+    display:flex;align-items:center;gap:10px;min-height:52px;box-shadow:0 6px 18px rgba(0,0,0,.2)
+  }
+  .caption-bar .who{font-size:12px;background:#ffffff33;padding:2px 8px;border-radius:10px;white-space:nowrap}
+  .caption-bar .txt{flex:1}
+  .controls{display:flex;gap:10px;align-items:center;justify-content:center;padding:14px 8px 6px;flex-wrap:wrap}
+  button.btn{
+    border:none;border-radius:24px;padding:10px 18px;font-size:15px;font-weight:700;cursor:pointer;
+    background:#fff;color:var(--ink);box-shadow:0 4px 12px rgba(60,80,120,.18);transition:transform .12s,background .2s
+  }
+  button.btn:hover{transform:translateY(-2px)}
+  button.btn.primary{background:linear-gradient(135deg,#ff8a65,#ff7043);color:#fff}
+  button.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+  .toggle{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--soft)}
+
+  /* 测验卡片 */
+  .quiz,.feynman{
+    background:#fffdf6;border:2px dashed var(--gold);border-radius:16px;padding:16px;margin-top:4px;z-index:1;animation:pop .35s ease
+  }
+  .quiz h3,.feynman h3{font-size:16px;color:#a9650a;margin-bottom:10px;display:flex;gap:6px;align-items:center}
+  .opt{display:block;width:100%;text-align:left;background:#fff;border:2px solid #f0d9a8;color:var(--ink);
+    border-radius:12px;padding:11px 14px;margin:8px 0;font-size:15px;cursor:pointer;transition:.15s}
+  .opt:hover{border-color:var(--gold)}
+  .opt.correct{background:#e6f7ee;border-color:var(--good);color:#1c7a4d;font-weight:700}
+  .opt.wrong{background:#fdecea;border-color:var(--bad);color:#b3261e}
+  .opt:disabled{cursor:default}
+  .explain{margin-top:10px;font-size:14px;line-height:1.6;color:var(--soft);background:#f6f8fc;padding:10px 12px;border-radius:10px;display:none}
+  .explain.show{display:block}
+  textarea{width:100%;min-height:90px;border:2px solid #e2e8f2;border-radius:12px;padding:12px;font-size:15px;
+    font-family:inherit;resize:vertical;line-height:1.6}
+  textarea:focus{outline:none;border-color:var(--student)}
+  .ref{margin-top:10px;font-size:14px;line-height:1.7;color:var(--ink);background:#eef7ff;border-left:4px solid var(--student);
+    padding:12px 14px;border-radius:0 10px 10px 0;display:none}
+  .ref.show{display:block}
+  .mini{font-size:13px;padding:8px 14px}
+  .hint{font-size:13px;color:var(--soft);text-align:center;margin-top:6px}
+
+  /* 开场 / 结束遮罩 */
+  .overlay{position:fixed;inset:0;background:linear-gradient(160deg,#33485e,#1f2d3d);color:#fff;z-index:30;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;gap:18px}
+  .overlay h2{font-size:26px}
+  .overlay p{max-width:520px;line-height:1.8;color:#dbe5f2}
+  .overlay .big{font-size:56px;animation:float 3s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .hidden{display:none!important}
+  .card-grid{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+  .kcard{background:#ffffff14;border:1px solid #ffffff2e;border-radius:14px;padding:12px 16px;min-width:150px;text-align:left}
+  .kcard b{color:#ffd54f}
+  footer{text-align:center;color:var(--soft);font-size:12px;padding:10px}
+  @media (max-width:560px){.bubble{max-width:85%}header h1{font-size:16px}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧑‍🏫 晓晓老师的不冒失修炼课 <span class="badge">初中生也能懂</span></h1>
+  <div class="progress-wrap">
+    <div class="progress"><i id="bar"></i></div>
+    <span id="pct" style="font-size:13px">0%</span>
+  </div>
+  <div class="score">⭐ 得分 <span id="score">0</span></div>
+</header>
+
+<main>
+  <div class="stage" id="stage">
+    <div class="hint" id="stageHint">点击「开始上课」，听晓晓老师讲课～</div>
+  </div>
+
+  <div class="caption">
+    <div class="caption-bar">
+      <span class="who" id="capWho">字幕</span>
+      <span class="txt" id="capTxt">准备好了吗？下面会有晓晓老师的语音讲解，字幕显示在這里，不会挡住上面的画面。</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prevBtn" disabled>⏮ 上一句</button>
+    <button class="btn primary" id="playBtn">▶ 开始上课</button>
+    <button class="btn" id="nextBtn" disabled>下一句 ⏭</button>
+    <label class="toggle"><input type="checkbox" id="autoChk" checked> 自动连播</label>
+    <label class="toggle"><input type="checkbox" id="capChk" checked> 字幕</label>
+  </div>
+</main>
+
+<footer>说话冒失别慌张 · 三招刹车记心上 · 晓晓老师陪你练</footer>
+
+<!-- 开场遮罩 -->
+<div class="overlay" id="introOverlay">
+  <div class="big">🎒</div>
+  <h2>欢迎来到晓晓老师的课堂！</h2>
+  <p>你是不是也像小明一样，<b>话到嘴边拦不住</b>，说完就后悔？这堂课，晓晓老师用<b>神经网络语音</b>一句句讲给你听，还会<b>随时抽查提问</b>、带你用<b>费曼学习法</b>复述。学完三招"刹车片"，你也能嘴脑同步、不再闯祸！</p>
+  <button class="btn primary" id="startBtn" style="font-size:17px;padding:14px 30px">🚀 开始上课</button>
+  <p style="font-size:13px;color:#9fb3c8">提示：戴上耳机效果更好；字幕在底部，不会挡住画面。</p>
+</div>
+
+<!-- 结束遮罩 -->
+<div class="overlay hidden" id="endOverlay">
+  <div class="big">🏆</div>
+  <h2>太棒了，课听完啦！</h2>
+  <p id="endMsg">你已学完三招刹车片 + 金句百宝箱。真正学会的标志是：<b>你能用自己的话讲给别人听</b>。去给家人或小明复述一遍吧！</p>
+  <div class="card-grid" id="endCards"></div>
+  <button class="btn primary" id="replayBtn" style="font-size:16px;padding:12px 26px">🔁 再听一遍</button>
+</div>
+
+<script>
+/* ===== 课程步骤数据 ===== */
+const STEPS = [
+  {id:"s01",sp:"teacher",sub:"大家好，我是晓晓老师。今天我们要上一堂特别的课——怎么改掉说话不经大脑的毛病。先来认识一位同学：小明。他最大的特点就是，嘴比脑子快！"},
+  {id:"s02",sp:"student",sub:"老师，我冤枉啊！我有时候话到嘴边，根本拦不住，就自己蹦出来了！"},
+  {id:"s03",sp:"teacher",sub:"其实冒失不是你的错，是人类大脑的一个小bug。我们大脑有两条通道：一条叫快思考，像滑梯，话嗖一下就滑出口了；一条叫慢思考，像爬楼梯，要一步一步想。我们脱口而出，就是因为坐了滑梯。"},
+  {id:"s04",sp:"teacher",sub:"那怎么办？今天我教你们三招刹车片，再加一个金句百宝箱。先学第一招：开口前，默念三个数。别人说完，你先在心里数，一、二、三。就像红绿灯，数到三才绿灯行。这3秒，就是给你的嘴巴装一个刹车。"},
+  {id:"s05",sp:"student",sub:"老师，数数的时候我脑子干嘛呀？光数数，不还是没想吗？"},
+  {id:"s06",sp:"teacher",sub:"问得好！数数的同时，你要在心里快速问自己三个问题。我编了个口诀，叫三问自查：该说吗？负责吗？能补吗？该说吗，是问这句话有没有必要；负责吗，是问你能不能为它负责；能补吗，是问说错了能不能圆回来。"},
+  {id:"s07",sp:"teacher",sub:"还有个物理小妙招：开口前，舌尖轻轻抵住上颚，停零点三秒。这个小动作，能真的让嘴巴慢半拍。外交官都这么练。"},
+  {id:"s08",sp:"student",sub:"老师，那要是吵架，我气得要命，根本数不下去怎么办？"},
+  {id:"s09",sp:"teacher",sub:"太真实了！生气的时候，情绪绑架了理性。这时候用情绪熔断：直接说，我需要喝口水，三分钟后再聊。物理离开，火气就降温了。这不是认输，是保护自己。"},
+  {id:"s10",sp:"teacher",sub:"好，第一招口诀记牢：红绿灯，数一二三；三问自查心里挂；舌抵上颚慢半拍。"},
+  {id:"s11",sp:"teacher",sub:"第二招：平时积累金句百宝箱。你以为那些说话让人舒服的高手是临场发挥？错！他们脑子里存了几百条现成的话。就像写作文要背好词好句，说话也要背话术。"},
+  {id:"s12",sp:"teacher",sub:"怎么积累？三招：第一，建一个金句本，刷到好的表达就抄下来；第二，背万能缓冲句，比如别人说完你接不上，就说，这个角度我还真没想过，你继续讲；第三，把绝对、肯定、必须，换成可能、通常、也许，话不说满，留余地。"},
+  {id:"s13",sp:"student",sub:"老师，我记性不好，背了就忘怎么办？"},
+  {id:"s14",sp:"teacher",sub:"那你就碎片化积累：每天睡前十五分钟，只背三句。坚持十四天，嘴就能跟上脑子。还有一个记忆口诀：好句抄一抄，缓冲背几条，话不说满留退路。"},
+  {id:"s15",sp:"teacher",sub:"第三招：聊天前，先在脑子里打草稿。很多人一开口就乱，是因为脑子里没结构。教你一个框架：结论先行，加三点支撑。就像写作文的总分总。"},
+  {id:"s16",sp:"teacher",sub:"比如别人问，周末去哪玩？冒失的人会说一堆废话。会说话的人先给结论：我去爬山。再说三点：因为天气好、能锻炼身体、还能拍照。清清楚楚。"},
+  {id:"s17",sp:"student",sub:"老师，万一到时候脑子一片空白呢？"},
+  {id:"s18",sp:"teacher",sub:"那用关键词提炼法：听别人说话时，你心里先抓三个关键词。比如对方说一大段，你抓住时间、地点、原因。有这三个词打底，你就不会慌。口诀：先结论，后三点；抓关键词心不乱。"},
+  {id:"s19",sp:"teacher",sub:"好，现在最关键的：没经验怎么办？很多同学说，我又没经历过，我哪会应对？其实，经验是可以借的。"},
+  {id:"s20",sp:"teacher",sub:"向有经验的人学，有三步：第一，找榜样，观察你身边那个说话让人舒服的人，他怎么接话、怎么拒绝；第二，场景预设，提前想好高频场景的万能回应，比如被点名发言，就说，我整理下思路，稍后细说；第三，角色扮演，和朋友模拟练习。"},
+  {id:"s21",sp:"student",sub:"老师，如果没有榜样可学呢？"},
+  {id:"s22",sp:"teacher",sub:"那就向书和案例学。看别人踩过的坑，就是你的经验。比如网上很多说错话补救的故事，你看一遍，就等于替自己试错了一次。口诀：找榜样，预设场，角色扮演练手上；没榜样，看书闯，别人踩坑我成长。"},
+  {id:"s23",sp:"teacher",sub:"现在，我要抽查啦！第一题：开口前默念三个数，主要目的是什么？",type:"quiz",
+    q:"开口前默念三个数，主要目的是什么？",
+    opts:["让对方等得着急","给大脑装刹车、切换到慢思考","显得自己很酷"],
+    ans:1, exp:"默念3个数不是为了折腾对方，而是给你的嘴巴装一个刹车，让直觉的快思考切换到理性的慢思考，避免脱口而出。"},
+  {id:"s24",sp:"teacher",sub:"第二题：把绝对没问题，换成下面哪一句更得体？",type:"quiz",
+    q:"把「绝对没问题」，换成下面哪一句更得体？",
+    opts:["肯定成","大概率可以","必须搞定"],
+    ans:1, exp:"「大概率可以」留了余地，万一没成也不算食言；「肯定成」「必须搞定」说太满，容易让自己下不来台。"},
+  {id:"s25",sp:"teacher",sub:"第三题，小明来问：同学问我，你觉得新来的老师凶不凶，我该怎么用今天学的招？请说出你的做法。",type:"feynman",
+    q:"小明问：「你觉得新来的老师凶不凶？」用今天学的招，你会怎么应对？写下来或大声说出来。",
+    ref:"这是评价别人、容易得罪人的场景。正确做法：先不急着下结论，用缓冲句+把评价变成提问。例如说：「我还没怎么接触呢，你这么一问我也好奇了，你觉得呢？」或者：「目前看不出来，咱们相处相处才知道～」这样既没随便评价老师，又把球传回去，不踩雷。也可以先数123，做三问自查：该说吗？这句话传出去我会负责吗？"},
+  {id:"s26",sp:"teacher",sub:"接下来是费曼复述挑战：请假装你是老师，用你自己的话，给小明讲一遍，为什么我们说话会冒失，以及默念三个数怎么救场。",type:"feynman",
+    q:"费曼复述挑战：用你自己的话，给小明讲一遍——为什么我们说话会冒失？默念三个数怎么救场？写下来或说给家人听。",
+    ref:"我们冒失，是因为大脑有「快思考」滑梯，话比脑子快就脱口而出。默念3个数，等于给嘴巴装刹车，把快思考切换成慢思考，同时用「该说吗、负责吗、能补吗」三问自查。再加上舌抵上颚的小动作帮忙慢半拍。讲不明白，就是没真懂——多讲两遍就通了！"},
+  {id:"s27",sp:"teacher",sub:"给大家一个参考答案要点：冒失是因为嘴比脑快，大脑走了快思考的滑梯；默念三个数，是装刹车、切到慢思考，同时三问自查。用自己的话讲一遍，才算真的学会。"},
+  {id:"s28",sp:"teacher",sub:"最后送你一首总口诀：说话冒失别慌张，三招刹车记心上。开口先数一二三，三问自查慢思量。金句百宝天天攒，结论三点不乱讲。没经验，找榜样，借来经验自己强。晓晓老师陪你练，嘴巴听话不闯祸！"},
+  {id:"s29",sp:"student",sub:"老师，我好像懂了！以后我先数一二三再开口！"},
+  {id:"s30",sp:"teacher",sub:"太棒了小明！记住：说出去的话，像泼出去的水，收不回来。慢一点，你会赢得更多朋友。今天的课就到这，记得每天练一招哦！"},
+];
+
+/* 不定时随机抽查题库（自动连播时可能在某一步突然弹出） */
+const BONUS_POOL = [
+  {q:"别人说话时你接不上话，下面哪句是好的缓冲句？",opts:["你讲的都是废话","这个角度我还真没想过，你继续讲","关我什么事"],ans:1,
+   exp:"「这个角度我还真没想过，你继续讲」既接住了话，又给自己留了思考时间，是万能缓冲句。"},
+  {q:"被老师突然点名发言，最恰当的做法是？",opts:["随便编两句","说：我整理下思路，稍后细说","假装没听见"],ans:1,
+   exp:"场景预设法：提前准备好万能回应，被点名就说「我整理下思路，稍后细说」，给自己留出组织语言的空间。"},
+  {q:"生气时话到嘴边，最好的处理是？",opts:["直接吼出来","用情绪熔断：先去喝口水，三分钟后再聊","立刻发朋友圈吐槽"],ans:1,
+   exp:"情绪熔断=物理离开现场，切断情绪化表达链条，这不是认输，是保护自己。"},
+];
+/* 随机选一个 narration 步骤作为不定时抽查位置 */
+const NARRATION_IDX = STEPS.map((s,i)=>i).filter(i=>!STEPS[i].type);
+const bonusPos = NARRATION_IDX[Math.floor(Math.random()*(NARRATION_IDX.length-6))+3];
+const bonusQ = BONUS_POOL[Math.floor(Math.random()*BONUS_POOL.length)];
+
+/* ===== 引擎 ===== */
+const stage = document.getElementById('stage');
+const capTxt = document.getElementById('capTxt');
+const capWho = document.getElementById('capWho');
+const bar = document.getElementById('bar');
+const pct = document.getElementById('pct');
+const scoreEl = document.getElementById('score');
+const playBtn = document.getElementById('playBtn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const autoChk = document.getElementById('autoChk');
+const capChk = document.getElementById('capChk');
+
+let cur = -1, score = 0, audio = new Audio(), playing = false, autoTimer = null, bonusUsed = false;
+
+function setProgress(){
+  const p = Math.round((cur+1)/STEPS.length*100);
+  bar.style.width = p+'%'; pct.textContent = p+'%';
+}
+function setCap(sp, txt){
+  if(!capChk.checked){capTxt.textContent='（字幕已关闭）';capWho.textContent='字幕';return;}
+  capWho.textContent = sp==='teacher'?'晓晓老师':'小明同学';
+  capTxt.textContent = txt;
+}
+function clearStage(){ stage.innerHTML=''; document.getElementById('stageHint')?.remove(); }
+
+function renderStep(i, isBonus=false){
+  const s = isBonus ? null : STEPS[i];
+  clearStage();
+  if(isBonus){
+    renderQuiz(bonusQ, ()=>advance());
+    setCap('teacher','（不定时抽查）'+bonusQ.q);
+    return;
+  }
+  // 头像 + 气泡
+  const row = document.createElement('div');
+  row.className = 'row '+(s.sp==='student'?'student':'');
+  const av = document.createElement('div');
+  av.className = 'avatar '+(s.sp==='student'?'student':'teacher');
+  av.textContent = s.sp==='student'?'明':'晓';
+  const col = document.createElement('div');
+  const name = document.createElement('div'); name.className='name';
+  name.textContent = s.sp==='student'?'小明同学':'晓晓老师';
+  const bub = document.createElement('div'); bub.className='bubble'; bub.textContent = s.sub;
+  col.appendChild(name); col.appendChild(bub);
+  row.appendChild(av); row.appendChild(col); stage.appendChild(row);
+  setCap(s.sp, s.sub);
+
+  if(s.type==='quiz'){ renderQuiz(s, ()=>afterNarration(i)); }
+  else if(s.type==='feynman'){ renderFeynman(s, ()=>afterNarration(i)); }
+  setProgress();
+  prevBtn.disabled = (i<=0);
+  nextBtn.disabled = (i>=STEPS.length-1) && !isBonus;
+}
+
+function renderQuiz(q, onDone){
+  const box=document.createElement('div'); box.className='quiz';
+  box.innerHTML='<h3>📝 晓晓老师抽查</h3>';
+  const h=document.createElement('div'); h.style.cssText='font-size:15px;line-height:1.7;margin-bottom:6px'; h.textContent=q.q; box.appendChild(h);
+  q.opts.forEach((o,idx)=>{
+    const b=document.createElement('button'); b.className='opt'; b.textContent=o;
+    b.onclick=()=>{
+      box.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+      if(idx===q.ans){ b.classList.add('correct'); addScore(10); }
+      else { b.classList.add('wrong'); box.querySelectorAll('.opt')[q.ans].classList.add('correct'); }
+      const e=document.createElement('div'); e.className='explain show'; e.textContent='💡 '+q.exp; box.appendChild(e);
+      const nb=document.createElement('button'); nb.className='btn primary mini'; nb.textContent='继续 ▶';
+      nb.style.marginTop='10px'; nb.onclick=()=>{ onDone(); }; box.appendChild(nb);
+    };
+    box.appendChild(b);
+  });
+  stage.appendChild(box);
+}
+function renderFeynman(s, onDone){
+  const box=document.createElement('div'); box.className='feynman';
+  box.innerHTML='<h3>🎤 费曼复述挑战</h3>';
+  const p=document.createElement('div'); p.style.cssText='font-size:15px;line-height:1.7;margin-bottom:8px'; p.textContent=s.q; box.appendChild(p);
+  const ta=document.createElement('textarea'); ta.placeholder='在这里用自己的话写下来，或大声说出来后点下面的按钮…'; box.appendChild(ta);
+  const rb=document.createElement('button'); rb.className='btn mini'; rb.textContent='👀 看参考答案';
+  const ref=document.createElement('div'); ref.className='ref'; ref.textContent=s.ref;
+  rb.onclick=()=>ref.classList.add('show');
+  const nb=document.createElement('button'); nb.className='btn primary mini'; nb.textContent='我已复述，继续 ▶';
+  nb.style.marginLeft='8px'; nb.onclick=()=>{ addScore(5); onDone(); };
+  const wrap=document.createElement('div'); wrap.style.marginTop='10px'; wrap.appendChild(rb); wrap.appendChild(nb);
+  box.appendChild(wrap); box.appendChild(ref);
+  stage.appendChild(box);
+}
+function addScore(n){ score+=n; scoreEl.textContent=score; }
+
+function playAudio(i, isBonus=false){
+  const file = isBonus ? null : 'audio/'+STEPS[i].id+'.mp3';
+  if(isBonus){ // 随机抽查无单独音频，直接展示
+    renderStep(i,true); return;
+  }
+  playing=true; playBtn.textContent='⏸ 播放中…'; playBtn.disabled=true;
+  audio.src=file; audio.play().catch(()=>{});
+  audio.onended=()=>{
+    playing=false; playBtn.disabled=false; playBtn.textContent='▶ 重播这句';
+    if(autoChk.checked && !STEPS[i].type){
+      // 不定时抽查：到达随机位置时插入
+      if(!bonusUsed && i===bonusPos){ bonusUsed=true; setTimeout(()=>{ showBonus(i); }, 400); return; }
+      autoTimer=setTimeout(()=>advance(), 500);
+    }
+  };
+}
+function showBonus(i){ renderStep(i,true); }
+
+function advance(){
+  if(cur>=STEPS.length-1){ finish(); return; }
+  cur++; renderStep(cur); playAudio(cur);
+}
+function afterNarration(i){
+  if(autoChk.checked){ autoTimer=setTimeout(()=>advance(), 400); }
+}
+function goStep(i){ cur=i; renderStep(cur); playAudio(cur); }
+
+function finish(){
+  clearStage();
+  document.getElementById('endOverlay').classList.remove('hidden');
+  const msg=document.getElementById('endMsg');
+  msg.innerHTML='你学完了三招刹车片 + 金句百宝箱，本次得分 ⭐ <b>'+score+'</b>。'+
+    '真正学会的标志是：<b>你能用自己的话讲给别人听</b>。去给家人或小明复述一遍吧！';
+  const cards=document.getElementById('endCards');
+  cards.innerHTML=`
+    <div class="kcard"><b>第一招</b><br>开口数123<br>三问自查+舌抵上颚</div>
+    <div class="kcard"><b>第二招</b><br>金句百宝箱<br>好句抄+缓冲句+话不说满</div>
+    <div class="kcard"><b>第三招</b><br>脑中打草稿<br>结论+三点+关键词</div>
+    <div class="kcard"><b>没经验</b><br>找榜样/预设场<br>看书闯/别人踩坑我成长</div>`;
+  bar.style.width='100%'; pct.textContent='100%';
+}
+
+/* 控件 */
+playBtn.onclick=()=>{
+  if(cur<0){ advance(); return; }
+  if(playing){ audio.pause(); playing=false; playBtn.disabled=false; playBtn.textContent='▶ 继续'; return; }
+  audio.play().catch(()=>{});
+};
+nextBtn.onclick=()=>{ if(cur<STEPS.length-1){ clearTimeout(autoTimer); advance(); } };
+prevBtn.onclick=()=>{ if(cur>0){ clearTimeout(autoTimer); goStep(cur-1); } };
+document.getElementById('startBtn').onclick=()=>{
+  document.getElementById('introOverlay').classList.add('hidden');
+  advance();
+};
+document.getElementById('replayBtn').onclick=()=>{
+  document.getElementById('endOverlay').classList.add('hidden');
+  cur=-1; score=0; scoreEl.textContent=0; bonusUsed=false; advance();
+};
+capChk.onchange=()=>{ if(cur>=0) setCap(STEPS[cur].sp, STEPS[cur].sub); };
+</script>
+</body>
+</html>

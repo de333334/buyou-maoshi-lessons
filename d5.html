@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日一练·得体拒绝+提意见 — 晓晓老师</title>
+<style>
+  :root{
+    --bg1:#eaf6f2; --bg2:#e8f0fe; --board:#1f5e57;
+    --ink:#21303a; --soft:#5b6b8c; --good:#33b679; --bad:#ef5350; --gold:#ffb300;
+    --teacher:#ff7043; --student:#0288d1;
+    --read-font:"SimSun","宋体","Songti SC","STSong",serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+    background:linear-gradient(160deg,var(--bg1),var(--bg2));
+    color:var(--ink);display:flex;flex-direction:column;min-height:100vh;
+  }
+  header{
+    background:var(--board);color:#fff;padding:12px 18px;display:flex;
+    align-items:center;gap:14px;flex-wrap:wrap;box-shadow:0 4px 14px rgba(0,0,0,.18);
+    position:sticky;top:0;z-index:5;
+  }
+  header h1{font-size:18px;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
+  .badge{background:var(--gold);color:#5a4500;font-size:12px;padding:2px 9px;border-radius:20px;font-weight:700}
+  .lesson-prog{flex:1;min-width:150px;display:flex;align-items:center;gap:8px}
+  .lp-bar{flex:1;height:8px;background:#ffffff33;border-radius:20px;overflow:hidden}
+  .lp-bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7ee0c3,#2e9e8a);transition:width .4s}
+  .score{background:#ffffff22;padding:4px 10px;border-radius:20px;font-size:13px;white-space:nowrap}
+  main{flex:1;display:flex;flex-direction:column;padding:16px 16px 8px;max-width:920px;width:100%;margin:0 auto}
+  .stage{
+    flex:1;background:#fff;border-radius:18px;box-shadow:0 8px 26px rgba(60,80,120,.14);
+    padding:18px;display:flex;flex-direction:column;gap:14px;min-height:280px;position:relative;overflow:hidden;
+  }
+  .stage::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% -10%,#e6faf3,transparent 55%);pointer-events:none}
+  .row{display:flex;gap:12px;align-items:flex-end;z-index:1}
+  .row.student{flex-direction:row-reverse}
+  .avatar{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:22px;font-weight:800;color:#fff;flex:0 0 auto;box-shadow:0 4px 10px rgba(0,0,0,.15)}
+  .avatar.teacher{background:linear-gradient(135deg,#ffb74d,#ff7043)}
+  .avatar.student{background:linear-gradient(135deg,#4fc3f7,#0288d1)}
+  .bubble{max-width:78%;background:#f4f7fb;border:1px solid #e4ebf5;border-radius:16px;padding:14px 17px;
+    line-height:1.95;font-size:18px;font-family:var(--read-font);animation:pop .35s ease}
+  .row.student .bubble{background:#e3f2fd;border-color:#cfe8fb}
+  .name{font-size:13px;color:var(--soft);margin:0 4px 4px;font-weight:700}
+  @keyframes pop{from{transform:translateY(8px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+
+  /* 底部字幕：不遮挡上方讲解 */
+  .caption{margin:12px auto 0;max-width:920px;width:100%;padding:0 16px}
+  .caption-bar{background:rgba(31,48,58,.94);color:#fff;border-radius:14px;padding:13px 17px;font-size:17px;
+    line-height:1.8;font-family:var(--read-font);display:flex;align-items:center;gap:10px;min-height:56px;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+  .caption-bar .who{font-size:12px;background:#ffffff33;padding:2px 8px;border-radius:10px;white-space:nowrap;font-family:inherit}
+  .caption-bar .txt{flex:1}
+
+  /* 可拖动的播放进度条 */
+  .player{max-width:920px;width:100%;margin:10px auto 0;padding:0 16px}
+  .seek-wrap{display:flex;align-items:center;gap:10px;background:#fff;border-radius:14px;padding:10px 14px;
+    box-shadow:0 4px 12px rgba(60,80,120,.12)}
+  .time{font-size:12px;color:var(--soft);font-variant-numeric:tabular-nums;white-space:nowrap;min-width:38px;text-align:center}
+  input[type=range].seek{
+    -webkit-appearance:none;appearance:none;flex:1;height:8px;border-radius:20px;cursor:pointer;
+    background:linear-gradient(90deg,#2e9e8a 0%, #2e9e8a 0%, #e6ecf5 0%, #e6ecf5 100%);
+  }
+  input[type=range].seek::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+    background:#1f5e57;box-shadow:0 2px 6px rgba(0,0,0,.25);cursor:pointer;border:2px solid #fff}
+  input[type=range].seek::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#1f5e57;border:2px solid #fff;cursor:pointer}
+
+  .controls{display:flex;gap:10px;align-items:center;justify-content:center;padding:12px 8px 6px;flex-wrap:wrap}
+  button.btn{border:none;border-radius:24px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;
+    background:#fff;color:var(--ink);box-shadow:0 4px 12px rgba(60,80,120,.18);transition:transform .12s,background .2s}
+  button.btn:hover{transform:translateY(-2px)}
+  button.btn.primary{background:linear-gradient(135deg,#34b89c,#1f5e57);color:#fff}
+  button.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+  .toggle{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--soft)}
+  .rate{font-size:13px;color:var(--soft);display:flex;align-items:center;gap:4px}
+  select{border:1px solid #d7dff0;border-radius:10px;padding:4px 6px;font-size:13px;color:var(--ink);background:#fff}
+
+  .quiz,.feynman{background:#fffdf6;border:2px dashed var(--gold);border-radius:16px;padding:16px;margin-top:4px;z-index:1;animation:pop .35s ease}
+  .quiz h3,.feynman h3{font-size:16px;color:#a9650a;margin-bottom:10px;display:flex;gap:6px;align-items:center}
+  .opt{display:block;width:100%;text-align:left;background:#fff;border:2px solid #f0d9a8;color:var(--ink);
+    border-radius:12px;padding:11px 14px;margin:8px 0;font-size:16px;cursor:pointer;transition:.15s;font-family:var(--read-font)}
+  .opt:hover{border-color:var(--gold)}
+  .opt.correct{background:#e6f7ee;border-color:var(--good);color:#1c7a4d;font-weight:700}
+  .opt.wrong{background:#fdecea;border-color:var(--bad);color:#b3261e}
+  .opt:disabled{cursor:default}
+  .explain{margin-top:10px;font-size:15px;line-height:1.7;color:var(--soft);background:#f6f8fc;padding:10px 12px;border-radius:10px;display:none;font-family:var(--read-font)}
+  .explain.show{display:block}
+  textarea{width:100%;min-height:92px;border:2px solid #e2e8f2;border-radius:12px;padding:12px;font-size:17px;font-family:var(--read-font);resize:vertical;line-height:1.8}
+  textarea:focus{outline:none;border-color:var(--student)}
+  .ref{margin-top:10px;font-size:15px;line-height:1.9;color:var(--ink);background:#eef7ff;border-left:4px solid var(--student);padding:12px 14px;border-radius:0 10px 10px 0;display:none;font-family:var(--read-font)}
+  .ref.show{display:block}
+  .mini{font-size:13px;padding:8px 14px}
+  .hint{font-size:14px;color:var(--soft);text-align:center;margin-top:6px;font-family:var(--read-font)}
+
+  .overlay{position:fixed;inset:0;background:linear-gradient(160deg,#1f5e57,#143a36);color:#fff;z-index:30;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;gap:16px}
+  .overlay h2{font-size:24px}
+  .overlay p{max-width:560px;line-height:1.9;color:#d6efe8;font-family:var(--read-font);font-size:17px}
+  .overlay .big{font-size:54px;animation:float 3s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .hidden{display:none!important}
+  .card-grid{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+  .kcard{background:#ffffff14;border:1px solid #ffffff2e;border-radius:14px;padding:12px 16px;min-width:150px;text-align:left;font-family:var(--read-font)}
+  .kcard b{color:#7ee0c3}
+  footer{text-align:center;color:var(--soft);font-size:12px;padding:10px}
+  @media (max-width:560px){.bubble{max-width:86%}header h1{font-size:15px}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧑‍🏫 每日一练 · 得体拒绝 + 提意见 <span class="badge">第5关</span></h1>
+  <div class="lesson-prog">
+    <div class="lp-bar"><i id="bar"></i></div>
+    <span id="pct" style="font-size:13px">0%</span>
+  </div>
+  <div class="score">⭐ 得分 <span id="score">0</span></div>
+</header>
+
+<main>
+  <div class="stage" id="stage">
+    <div class="hint" id="stageHint">点击「开始上课」，听晓晓老师用神经网络语音一句句讲～</div>
+  </div>
+
+  <div class="caption">
+    <div class="caption-bar">
+      <span class="who" id="capWho">字幕</span>
+      <span class="txt" id="capTxt">准备好了吗？语音讲解会显示字幕在这里，不会挡住上面的画面。进度条可以随意拖动。</span>
+    </div>
+  </div>
+
+  <!-- 可拖动播放进度条 -->
+  <div class="player">
+    <div class="seek-wrap">
+      <span class="time" id="curTime">0:00</span>
+      <input type="range" class="seek" id="seek" min="0" max="1000" value="0" step="1" aria-label="播放进度，可拖动">
+      <span class="time" id="durTime">0:00</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prevBtn" disabled>⏮ 上一句</button>
+    <button class="btn" id="back5">⏪ 5秒</button>
+    <button class="btn primary" id="playBtn">▶ 开始上课</button>
+    <button class="btn" id="fwd5">5秒 ⏩</button>
+    <button class="btn" id="nextBtn" disabled>下一句 ⏭</button>
+  </div>
+  <div class="controls" style="padding-top:0">
+    <label class="toggle"><input type="checkbox" id="autoChk" checked> 自动连播</label>
+    <label class="toggle"><input type="checkbox" id="capChk" checked> 字幕</label>
+    <label class="rate">语速
+      <select id="rateSel">
+        <option value="0.75">0.75×</option>
+        <option value="0.9">0.9×</option>
+        <option value="1" selected>1.0×</option>
+        <option value="1.25">1.25×</option>
+        <option value="1.5">1.5×</option>
+      </select>
+    </label>
+  </div>
+</main>
+
+<footer>会拒绝不冷漠 · 提意见不挑刺 · 先谢后拒给台阶 · 晓晓老师陪你练</footer>
+
+<div class="overlay" id="introOverlay">
+  <div class="big">🙅‍♂️💬</div>
+  <h2>今天练：学会说「不」，也会提意见</h2>
+  <p>别人求你帮忙、你想拒绝却怕伤和气？看出对方的问题、想提意见却怕惹毛人？这一关，晓晓老师用<b>神经网络语音</b>一句句讲：<b>拒绝三明治</b>（先谢后拒给台阶）、<b>提意见的「我句式」</b>、<b>反馈三明治</b>、<b>缓冲句争取时间</b>、<b>话别说满</b>。中途会<b>随时抽查</b>、带你<b>费曼复述</b>。进度条能随便拖，听不清就往回拉！</p>
+  <button class="btn primary" id="startBtn" style="font-size:17px;padding:14px 30px">🚀 开始上课</button>
+  <p style="font-size:13px;color:#9fd9cd">建议戴耳机；字幕在底部，不挡画面；宋体大字，看得清。</p>
+</div>
+
+<div class="overlay hidden" id="endOverlay">
+  <div class="big">🏆</div>
+  <h2>这一关，你过了！</h2>
+  <p id="endMsg"></p>
+  <div class="card-grid" id="endCards"></div>
+  <button class="btn primary" id="replayBtn" style="font-size:16px;padding:12px 26px">🔁 再练一遍</button>
+</div>
+
+<script>
+/* ===== 课程步骤（sub=字幕；id=音频文件名） ===== */
+const STEPS = [
+  {id:"t01",sp:"teacher",sub:"同学们好，我是晓晓老师，欢迎回到不冒失修炼课。昨天我们练的是接不上话怎么救场，今天练第5关——更难也更常见的两件事：别人求你帮忙、你想拒绝；还有你看出对方的问题、想提个意见。"},
+  {id:"t02",sp:"student",sub:"老师，这两个我都栽过跟头！上次同桌考试前找我借笔记，我脱口就是一句：凭什么啊，自己不整理怪谁。结果我俩冷战了三天……"},
+  {id:"t03",sp:"teacher",sub:"太典型了。你看，问题其实不在给不给，在怎么说。拒绝也能让人舒服，提意见也能让人愿意听。今天这套方法你练熟，谁都不得罪。开口前，还是老规矩，先在心里数三个数。"},
+  {id:"t04",sp:"teacher",sub:"第一招：拒绝三明治，先谢、后拒、给台阶。直接甩一句「不行」，像一巴掌；但把这个「不」，夹在两片软面包里，味道就完全不一样。结构是——先接住对方，再说清界限，最后给个台阶。"},
+  {id:"t05",sp:"teacher",sub:"还拿借笔记举例。你可以说：谢谢你想到我，这份笔记是我自己复习用的，暂时不太方便发；不过最容易错的两道题，我可以给你讲讲，咱俩一起过一遍。先谢让对方不尴尬，给台阶让拒绝不像关门，像换了扇窗。"},
+  {id:"t06",sp:"student",sub:"哦！先谢「你想到我」，再说「自己复习用的」，最后给个「讲错题」的台阶。这样对方就不会觉得被一口回绝了！"},
+  {id:"t07",sp:"teacher",sub:"对喽。口诀记住：先谢后拒给台阶，关门也要留扇窗。第二招：拒绝要对事不对人，理由越短越稳。冒失鬼一拒绝就爱长篇解释，越解释越像找借口，还容易顺嘴得罪人。"},
+  {id:"t08",sp:"teacher",sub:"比如别这么说：我那天特别忙，而且你上次借我东西也没还，再说你这要求也有点过分。一句话把旧账全翻出来了。你只要说：这次真排不开，抱歉啦。短、诚恳、不翻旧账。你拒绝的是「这件事」，不是「这个人」。"},
+  {id:"t09",sp:"student",sub:"老师，那要是我一下子没想好到底帮不帮呢？当场答应又怕做不到，当场拒绝又怕后悔。"},
+  {id:"t10",sp:"teacher",sub:"问得好，这就是第三招：先用缓冲句争取时间，不当场答、也不当场拒。你就说：这个我得看下安排，晚点给你准信；或者：让我想想怎么弄最好，一会儿回你。先按下暂停键，再决定要不要接。这不是敷衍，是负责——答应了做不到，比当场拒绝更伤人。"},
+  {id:"t11",sp:"teacher",sub:"好，说完拒绝，说提意见。第四招：提意见用「我句式」，别用「你总是」。你一开口如果是：你怎么又迟到、你总是不认真，对方立刻竖起刺，因为这是在说「他这个人不行」，谁都受不了。"},
+  {id:"t12",sp:"teacher",sub:"心理学家托马斯·戈登提出过一个方法，叫「我-信息」，也就是非暴力沟通，就三步：先说事实，再说我的感受，最后提一个具体请求。"},
+  {id:"t13",sp:"teacher",sub:"对比一下。别说：你每次小组作业都拖到最后，太不负责了。改成：这周的作业最后一天才交上来，我有点担心来不及检查，下次能不能提前一天给我。前一句在审判人，后一句在说自己加提请求，对方反而愿意配合。"},
+  {id:"t14",sp:"student",sub:"我懂了！把「你总是怎样怎样」，换成：我看到什么，我觉得什么，我希望什么。这样就不像骂人了。"},
+  {id:"t15",sp:"teacher",sub:"聪明！第五招：提意见先夸再建议，反馈三明治。把改进点，夹在两句真诚具体的肯定里。比如：你这次的配色特别舒服，如果字号再大一点，后排同学会不会看得更清？以你的审美，改完肯定更抢眼。"},
+  {id:"t16",sp:"teacher",sub:"注意两点：肯定必须真诚具体，别敷衍地说一句「你很棒」，对方一听就知道你在铺垫批评。建议要用「如果怎样会不会更好」这种商量的语气，比「你应该」顺耳十倍。还有，私下、平静的时候说，比当众指出有效得多。"},
+  {id:"t17",sp:"teacher",sub:"再给你三问自查慢思量。拒绝或提意见前，心里默念三问：第一，该说吗，是必要的还是我一时上头？第二，伤人吗，我说的是这件事还是在攻击这个人？第三，有台阶吗，我给对方留余地了吗？三问过一遍，再数三秒，话就稳了。"},
+  {id:"t18",sp:"teacher",sub:"还有话别说太满。把绝对、肯定、必须、从来，换成可能、通常、也许、这次。别说「我永远不可能帮你」，改成「这次恐怕帮不上，下回有机会再说」。留余地，是给对方台阶，也是给自己留后路。"},
+  {id:"t19",sp:"teacher",sub:"没经验怎么办？借经验。找榜样：看那个拒绝了你、你还不生气的人，他怎么说的，抄进金句本。角色扮演：找朋友演一场，他来借东西你练拒绝三明治。向书学：戈登的「我-信息」、非暴力沟通，都是别人替你踩过的坑，你看一遍等于先替自己试错一次。"},
+
+  {id:"t20",sp:"teacher",sub:"抽查第一题：同学考前问你借你熬夜整理的笔记，你不太想给，哪句最得体？",type:"quiz",
+    q:"同学考前问你借你熬夜整理的笔记，你不太想给，哪句最得体？",
+    opts:["凭什么啊，自己不整理怪谁","行行行给你（其实心里很不情愿）","谢谢你想到我～这份是我自己复习用的暂时不方便发；不过最容易错的两道题我可以讲讲，咱一起过"],
+    ans:2, exp:"C 用了「拒绝三明治」：先接住（谢谢你想到我）→ 说清界限（自己复习用的）→ 给台阶（讲错题）。A 冒失伤人，B 委屈自己、事后憋屈。"},
+  {id:"t21",sp:"teacher",sub:"抽查第二题：小组同学总拖到最后一天交作业，你想提醒他，哪句更容易被接受？",type:"quiz",
+    q:"小组同学总拖到最后一天交作业，你想提醒他，哪句更容易被接受？",
+    opts:["你每次都拖到最后，太不负责了！","作业最后一天才交上来，我有点担心来不及检查，下次能不能提前一天给我？","算了不说了，说了你也不改"],
+    ans:1, exp:"B 用了「我句式」：说事实（最后一天交）+ 说感受（担心来不及）+ 提具体请求（提前一天）。A 在攻击人格会引发防御；C 憋着不说、问题继续。"},
+  {id:"t22",sp:"teacher",sub:"应用题来啦。小明，假如周末同学非要拉你去打游戏，可你作业没写完不想去。请用「拒绝三明治」说一句你会怎么拒绝——先谢、后拒、给台阶。",type:"feynman",
+    q:"应用题：周末同学非拉你去打游戏，你作业没写完、不想去。请用「拒绝三明治」（先谢→后拒→给台阶）写一句你会怎么拒绝。",
+    ref:"参考：谢谢你叫上我，我也想去（先谢）；不过今天作业还没写完，这次去不了（后拒，理由短）；等我周日写完，咱约下午一起打，我请你喝奶茶？（给台阶+温度）。—— 既没硬邦邦回绝，也没勉强自己，还给了下次的约定。"},
+  {id:"t23",sp:"teacher",sub:"费曼复述挑战：假装你是老师，用自己的话讲一遍——「拒绝三明治」是哪三步？提意见的「我句式」又是哪三步？",type:"feynman",
+    q:"费曼复述：用你自己的话，给别人讲一遍——「拒绝三明治」是哪三步（先谢→？→？）？提意见的「我句式」又是哪三步？写下来或说给家人听。",
+    ref:"参考：拒绝三明治=先接住对方（谢谢/共情）→ 说清界限（简短理由拒绝）→ 给台阶（替代方案或温度）。我句式=说事实（不评价）→ 说我的感受 → 提一个具体请求。核心都是：对事不对人、话别说满、给对方留余地。讲不明白，就是还没真懂，多讲两遍就通了！"},
+
+  {id:"t24",sp:"teacher",sub:"今天口诀送给你：求你帮忙别硬回，先谢后拒给台阶；对事不对人，理由短一截；想拒先缓冲，「晚点给你信」；提意见用「我」不用「你」，先夸再建议，「这样会不会更好」？话别说太满，「可能、也许」留退路。"},
+  {id:"t25",sp:"student",sub:"老师我记住啦！下次拒绝我先说「谢谢你想到我」，提意见我先夸再建议，用「我」不用「你」！"},
+  {id:"t26",sp:"teacher",sub:"太棒了小明！记住：会拒绝，不是冷漠，是尊重自己也尊重别人；会提意见，不是挑刺，是希望大家一起变好。慢一点、软一点，你就是那个让人舒服的人。今天的课就到这，明天见下一关！"},
+];
+
+/* ===== 不定时随机抽查题库（自动连播时会在某一句后突然弹出） ===== */
+const BONUS_POOL = [
+  {q:"（突击）朋友临时求你帮个不方便的忙，你想拒绝，哪句是「拒绝三明治」？",opts:["不行，我没空","谢谢你想到我，这次真排不开；下回有需要我尽量帮","这种事你怎么好意思找我"],ans:1,
+   exp:"先接住（谢谢你想到我）→ 简短拒绝（这次排不开）→ 给温度（下回尽量帮），不伤和气。"},
+  {q:"（突击）想给同学提改进意见，哪句用了「我句式」、不伤人？",opts:["你写的字太乱了，重写","这份笔记我有些地方看不太清，能不能写工整点，我好照着复习","随便你吧，我懒得说"],ans:1,
+   exp:"说事实（看不太清）+ 提请求（写工整点），对事不对人；A 在指责，C 是憋着不说。"},
+  {q:"（突击）把「你这方案肯定不行」换成哪句更留余地、更好接受？",opts:["这方案必须重做","这版可能还有能优化的地方，我们再看看？","你就没做对过"],ans:1,
+   exp:"用「可能」把话说成灰度，再用「我们再看看」一起解决，既留余地又不否定人。"},
+];
+const NARR_IDX = STEPS.map((s,i)=>i).filter(i=>!STEPS[i].type);
+const bonusPos = NARR_IDX[Math.floor(Math.random()*(NARR_IDX.length-6))+3];
+const bonusQ = BONUS_POOL[Math.floor(Math.random()*BONUS_POOL.length)];
+
+/* ===== 元素 ===== */
+const stage=document.getElementById('stage'), capTxt=document.getElementById('capTxt'), capWho=document.getElementById('capWho');
+const bar=document.getElementById('bar'), pct=document.getElementById('pct'), scoreEl=document.getElementById('score');
+const playBtn=document.getElementById('playBtn'), prevBtn=document.getElementById('prevBtn'), nextBtn=document.getElementById('nextBtn');
+const autoChk=document.getElementById('autoChk'), capChk=document.getElementById('capChk'), rateSel=document.getElementById('rateSel');
+const seek=document.getElementById('seek'), curTime=document.getElementById('curTime'), durTime=document.getElementById('durTime');
+const back5=document.getElementById('back5'), fwd5=document.getElementById('fwd5');
+
+let cur=-1, score=0, audio=new Audio(), playing=false, autoTimer=null, bonusUsed=false, seeking=false;
+
+function fmt(t){ if(!isFinite(t)||t<0)t=0; const m=Math.floor(t/60), s=Math.floor(t%60); return m+':'+(s<10?'0':'')+s; }
+function setLessonProg(){ const p=Math.round((cur+1)/STEPS.length*100); bar.style.width=p+'%'; pct.textContent=p+'%'; }
+function setCap(sp,txt){ if(!capChk.checked){capTxt.textContent='（字幕已关闭）';capWho.textContent='字幕';return;} capWho.textContent=sp==='teacher'?'晓晓老师':'小明同学'; capTxt.textContent=txt; }
+function clearStage(){ stage.innerHTML=''; document.getElementById('stageHint')?.remove(); }
+function paintSeek(){ const v=(+seek.value)/1000*100; seek.style.background=`linear-gradient(90deg,#2e9e8a ${v}%, #e6ecf5 ${v}%)`; }
+
+function renderStep(i,isBonus=false){
+  clearStage();
+  if(isBonus){ renderQuiz(bonusQ,()=>advance(),true); setCap('teacher','（不定时抽查）'+bonusQ.q); return; }
+  const s=STEPS[i];
+  const row=document.createElement('div'); row.className='row '+(s.sp==='student'?'student':'');
+  const av=document.createElement('div'); av.className='avatar '+(s.sp==='student'?'student':'teacher'); av.textContent=s.sp==='student'?'明':'晓';
+  const col=document.createElement('div');
+  const name=document.createElement('div'); name.className='name'; name.textContent=s.sp==='student'?'小明同学':'晓晓老师';
+  const bub=document.createElement('div'); bub.className='bubble'; bub.textContent=s.sub;
+  col.appendChild(name); col.appendChild(bub); row.appendChild(av); row.appendChild(col); stage.appendChild(row);
+  setCap(s.sp,s.sub);
+  if(s.type==='quiz'){ renderQuiz(s,()=>afterNarration(i)); }
+  else if(s.type==='feynman'){ renderFeynman(s,()=>afterNarration(i)); }
+  setLessonProg();
+  prevBtn.disabled=(i<=0); nextBtn.disabled=(i>=STEPS.length-1);
+}
+function renderQuiz(q,onDone,isBonus){
+  const box=document.createElement('div'); box.className='quiz';
+  box.innerHTML='<h3>📝 '+(isBonus?'不定时突击抽查':'晓晓老师抽查')+'</h3>';
+  const h=document.createElement('div'); h.style.cssText='font-size:17px;line-height:1.8;margin-bottom:6px;font-family:var(--read-font)'; h.textContent=q.q; box.appendChild(h);
+  q.opts.forEach((o,idx)=>{
+    const b=document.createElement('button'); b.className='opt'; b.textContent=o;
+    b.onclick=()=>{
+      box.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+      if(idx===q.ans){ b.classList.add('correct'); addScore(10); } else { b.classList.add('wrong'); box.querySelectorAll('.opt')[q.ans].classList.add('correct'); }
+      const e=document.createElement('div'); e.className='explain show'; e.textContent='💡 '+q.exp; box.appendChild(e);
+      const nb=document.createElement('button'); nb.className='btn primary mini'; nb.textContent='继续 ▶'; nb.style.marginTop='10px'; nb.onclick=()=>onDone(); box.appendChild(nb);
+    };
+    box.appendChild(b);
+  });
+  stage.appendChild(box);
+}
+function renderFeynman(s,onDone){
+  const box=document.createElement('div'); box.className='feynman';
+  box.innerHTML='<h3>🎤 '+(s.q.indexOf('费曼')>=0?'费曼复述挑战':'应用挑战')+'</h3>';
+  const p=document.createElement('div'); p.style.cssText='font-size:17px;line-height:1.8;margin-bottom:8px;font-family:var(--read-font)'; p.textContent=s.q; box.appendChild(p);
+  const ta=document.createElement('textarea'); ta.placeholder='用自己的话写下来，或大声说出来后点下面的按钮…'; box.appendChild(ta);
+  const rb=document.createElement('button'); rb.className='btn mini'; rb.textContent='👀 看参考答案';
+  const ref=document.createElement('div'); ref.className='ref'; ref.textContent=s.ref; rb.onclick=()=>ref.classList.add('show');
+  const nb=document.createElement('button'); nb.className='btn primary mini'; nb.textContent='我已复述，继续 ▶'; nb.style.marginLeft='8px'; nb.onclick=()=>{ addScore(5); onDone(); };
+  const wrap=document.createElement('div'); wrap.style.marginTop='10px'; wrap.appendChild(rb); wrap.appendChild(nb); box.appendChild(wrap); box.appendChild(ref);
+  stage.appendChild(box);
+}
+function addScore(n){ score+=n; scoreEl.textContent=score; }
+
+/* ===== 音频引擎 ===== */
+function loadAndPlay(i){
+  playing=true; playBtn.textContent='⏸ 暂停';
+  audio.src='audio_d0716/'+STEPS[i].id+'.mp3';
+  audio.playbackRate=parseFloat(rateSel.value);
+  audio.play().catch(()=>{ playBtn.textContent='▶ 播放'; });
+}
+audio.addEventListener('loadedmetadata',()=>{ durTime.textContent=fmt(audio.duration); });
+audio.addEventListener('timeupdate',()=>{
+  if(seeking) return;
+  curTime.textContent=fmt(audio.currentTime);
+  if(audio.duration){ seek.value=Math.round(audio.currentTime/audio.duration*1000); paintSeek(); }
+});
+audio.addEventListener('ended',()=>{
+  playing=false; playBtn.textContent='▶ 重播这句';
+  const i=cur;
+  if(autoChk.checked && !STEPS[i].type){
+    if(!bonusUsed && i===bonusPos){ bonusUsed=true; setTimeout(()=>renderStep(i,true),400); return; }
+    autoTimer=setTimeout(()=>advance(),450);
+  }
+});
+/* 拖动进度条：随意调播放位置 */
+seek.addEventListener('input',()=>{ seeking=true; paintSeek(); if(audio.duration){ curTime.textContent=fmt((+seek.value)/1000*audio.duration); } });
+seek.addEventListener('change',()=>{ if(audio.duration){ audio.currentTime=(+seek.value)/1000*audio.duration; } seeking=false; });
+back5.onclick=()=>{ audio.currentTime=Math.max(0,audio.currentTime-5); };
+fwd5.onclick=()=>{ if(audio.duration) audio.currentTime=Math.min(audio.duration,audio.currentTime+5); };
+rateSel.onchange=()=>{ audio.playbackRate=parseFloat(rateSel.value); };
+
+function advance(){ if(cur>=STEPS.length-1){ finish(); return; } cur++; renderStep(cur); loadAndPlay(cur); }
+function afterNarration(i){ if(autoChk.checked){ autoTimer=setTimeout(()=>advance(),400); } }
+function goStep(i){ cur=i; renderStep(cur); loadAndPlay(cur); }
+function resetSeek(){ audio.pause(); seek.value=0; paintSeek(); curTime.textContent='0:00'; durTime.textContent='0:00'; playing=false; playBtn.textContent='▶ 播放'; }
+
+function finish(){
+  clearStage(); resetSeek();
+  document.getElementById('endOverlay').classList.remove('hidden');
+  document.getElementById('endMsg').innerHTML='你练完了「得体拒绝 + 提意见」这一关，本次得分 ⭐ <b>'+score+'</b>。真正学会的标志：<b>下次想拒绝时，你能先来一句「谢谢你想到我」，再给个台阶。</b>';
+  document.getElementById('endCards').innerHTML=`
+    <div class="kcard"><b>第一招</b><br>拒绝三明治<br>先谢→后拒→给台阶</div>
+    <div class="kcard"><b>第二招</b><br>对事不对人<br>理由短、不翻旧账</div>
+    <div class="kcard"><b>第三招</b><br>缓冲句<br>「晚点给你准信」</div>
+    <div class="kcard"><b>第四招</b><br>我句式<br>事实→感受→请求</div>
+    <div class="kcard"><b>第五招</b><br>反馈三明治<br>先夸→再建议→鼓励</div>`;
+  bar.style.width='100%'; pct.textContent='100%';
+}
+
+/* 控件 */
+playBtn.onclick=()=>{
+  if(cur<0){ advance(); return; }
+  if(playing){ audio.pause(); playing=false; playBtn.textContent='▶ 继续'; }
+  else { playing=true; playBtn.textContent='⏸ 暂停'; audio.play().catch(()=>{}); }
+};
+nextBtn.onclick=()=>{ if(cur<STEPS.length-1){ clearTimeout(autoTimer); advance(); } };
+prevBtn.onclick=()=>{ if(cur>0){ clearTimeout(autoTimer); goStep(cur-1); } };
+document.getElementById('startBtn').onclick=()=>{ document.getElementById('introOverlay').classList.add('hidden'); advance(); };
+document.getElementById('replayBtn').onclick=()=>{ document.getElementById('endOverlay').classList.add('hidden'); cur=-1; score=0; scoreEl.textContent=0; bonusUsed=false; advance(); };
+capChk.onchange=()=>{ if(cur>=0 && STEPS[cur]) setCap(STEPS[cur].sp,STEPS[cur].sub); };
+paintSeek();
+</script>
+</body>
+</html>
