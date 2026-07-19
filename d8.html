@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日一练 · 接软钉子与玩笑：不炸不怂接得住 — 晓晓老师</title>
+<style>
+  :root{
+    --bg1:#eaf6f2; --bg2:#e8f0fe; --board:#1f5e57;
+    --ink:#21303a; --soft:#5b6b8c; --good:#33b679; --bad:#ef5350; --gold:#ffb300;
+    --teacher:#ff7043; --student:#0288d1;
+    --read-font:"SimSun","宋体","Songti SC","STSong",serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+    background:linear-gradient(160deg,var(--bg1),var(--bg2));
+    color:var(--ink);display:flex;flex-direction:column;min-height:100vh;
+  }
+  header{
+    background:var(--board);color:#fff;padding:12px 18px;display:flex;
+    align-items:center;gap:14px;flex-wrap:wrap;box-shadow:0 4px 14px rgba(0,0,0,.18);
+    position:sticky;top:0;z-index:5;
+  }
+  header h1{font-size:18px;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
+  .badge{background:var(--gold);color:#5a4500;font-size:12px;padding:2px 9px;border-radius:20px;font-weight:700}
+  .lesson-prog{flex:1;min-width:150px;display:flex;align-items:center;gap:8px}
+  .lp-bar{flex:1;height:8px;background:#ffffff33;border-radius:20px;overflow:hidden}
+  .lp-bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7ee0c3,#2e9e8a);transition:width .4s}
+  .score{background:#ffffff22;padding:4px 10px;border-radius:20px;font-size:13px;white-space:nowrap}
+  main{flex:1;display:flex;flex-direction:column;padding:16px 16px 8px;max-width:920px;width:100%;margin:0 auto}
+  .stage{
+    flex:1;background:#fff;border-radius:18px;box-shadow:0 8px 26px rgba(60,80,120,.14);
+    padding:18px;display:flex;flex-direction:column;gap:14px;min-height:280px;position:relative;overflow:hidden;
+  }
+  .stage::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% -10%,#e6faf3,transparent 55%);pointer-events:none}
+  .row{display:flex;gap:12px;align-items:flex-end;z-index:1}
+  .row.student{flex-direction:row-reverse}
+  .avatar{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:22px;font-weight:800;color:#fff;flex:0 0 auto;box-shadow:0 4px 10px rgba(0,0,0,.15)}
+  .avatar.teacher{background:linear-gradient(135deg,#ffb74d,#ff7043)}
+  .avatar.student{background:linear-gradient(135deg,#4fc3f7,#0288d1)}
+  .bubble{max-width:78%;background:#f4f7fb;border:1px solid #e4ebf5;border-radius:16px;padding:14px 17px;
+    line-height:1.95;font-size:18px;font-family:var(--read-font);animation:pop .35s ease}
+  .row.student .bubble{background:#e3f2fd;border-color:#cfe8fb}
+  .name{font-size:13px;color:var(--soft);margin:0 4px 4px;font-weight:700}
+  @keyframes pop{from{transform:translateY(8px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+
+  /* 案例图：插图容器 */
+  .illu{margin:2px 0 4px;background:#fbfdff;border:1px dashed #cfe0ea;border-radius:14px;padding:10px;z-index:1;animation:pop .35s ease}
+  .illu svg{width:100%;height:auto;display:block;border-radius:10px}
+  .illu .illu-cap{font-size:13px;color:var(--soft);text-align:center;margin-top:6px;font-family:var(--read-font)}
+
+  /* 底部字幕：不遮挡上方讲解 */
+  .caption{margin:12px auto 0;max-width:920px;width:100%;padding:0 16px}
+  .caption-bar{background:rgba(31,48,58,.94);color:#fff;border-radius:14px;padding:13px 17px;font-size:17px;
+    line-height:1.8;font-family:var(--read-font);display:flex;align-items:center;gap:10px;min-height:56px;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+  .caption-bar .who{font-size:12px;background:#ffffff33;padding:2px 8px;border-radius:10px;white-space:nowrap;font-family:inherit}
+  .caption-bar .txt{flex:1}
+
+  /* 可拖动的播放进度条 */
+  .player{max-width:920px;width:100%;margin:10px auto 0;padding:0 16px}
+  .seek-wrap{display:flex;align-items:center;gap:10px;background:#fff;border-radius:14px;padding:10px 14px;
+    box-shadow:0 4px 12px rgba(60,80,120,.12)}
+  .time{font-size:12px;color:var(--soft);font-variant-numeric:tabular-nums;white-space:nowrap;min-width:38px;text-align:center}
+  input[type=range].seek{
+    -webkit-appearance:none;appearance:none;flex:1;height:8px;border-radius:20px;cursor:pointer;
+    background:linear-gradient(90deg,#2e9e8a 0%, #2e9e8a 0%, #e6ecf5 0%, #e6ecf5 100%);
+  }
+  input[type=range].seek::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+    background:#1f5e57;box-shadow:0 2px 6px rgba(0,0,0,.25);cursor:pointer;border:2px solid #fff}
+  input[type=range].seek::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#1f5e57;border:2px solid #fff;cursor:pointer}
+
+  .controls{display:flex;gap:10px;align-items:center;justify-content:center;padding:12px 8px 6px;flex-wrap:wrap}
+  button.btn{border:none;border-radius:24px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;
+    background:#fff;color:var(--ink);box-shadow:0 4px 12px rgba(60,80,120,.18);transition:transform .12s,background .2s}
+  button.btn:hover{transform:translateY(-2px)}
+  button.btn.primary{background:linear-gradient(135deg,#34b89c,#1f5e57);color:#fff}
+  button.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+  .toggle{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--soft)}
+  .rate{font-size:13px;color:var(--soft);display:flex;align-items:center;gap:4px}
+  select{border:1px solid #d7dff0;border-radius:10px;padding:4px 6px;font-size:13px;color:var(--ink);background:#fff}
+
+  .quiz,.feynman{background:#fffdf6;border:2px dashed var(--gold);border-radius:16px;padding:16px;margin-top:4px;z-index:1;animation:pop .35s ease}
+  .quiz h3,.feynman h3{font-size:16px;color:#a9650a;margin-bottom:10px;display:flex;gap:6px;align-items:center}
+  .opt{display:block;width:100%;text-align:left;background:#fff;border:2px solid #f0d9a8;color:var(--ink);
+    border-radius:12px;padding:11px 14px;margin:8px 0;font-size:17px;cursor:pointer;transition:.15s;font-family:var(--read-font)}
+  .opt:hover{border-color:var(--gold)}
+  .opt.correct{background:#e6f7ee;border-color:var(--good);color:#1c7a4d;font-weight:700}
+  .opt.wrong{background:#fdecea;border-color:var(--bad);color:#b3261e}
+  .opt:disabled{cursor:default}
+  .explain{margin-top:10px;font-size:15px;line-height:1.7;color:var(--soft);background:#f6f8fc;padding:10px 12px;border-radius:10px;display:none;font-family:var(--read-font)}
+  .explain.show{display:block}
+  textarea{width:100%;min-height:92px;border:2px solid #e2e8f2;border-radius:12px;padding:12px;font-size:17px;font-family:var(--read-font);resize:vertical;line-height:1.8}
+  textarea:focus{outline:none;border-color:var(--student)}
+  .ref{margin-top:10px;font-size:15px;line-height:1.9;color:var(--ink);background:#eef7ff;border-left:4px solid var(--student);padding:12px 14px;border-radius:0 10px 10px 0;display:none;font-family:var(--read-font)}
+  .ref.show{display:block}
+  .mini{font-size:13px;padding:8px 14px}
+  .hint{font-size:14px;color:var(--soft);text-align:center;margin-top:6px;font-family:var(--read-font)}
+
+  .overlay{position:fixed;inset:0;background:linear-gradient(160deg,#1f5e57,#143a36);color:#fff;z-index:30;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;gap:16px}
+  .overlay h2{font-size:24px}
+  .overlay p{max-width:560px;line-height:1.9;color:#d6efe8;font-family:var(--read-font);font-size:17px}
+  .overlay .big{font-size:54px;animation:float 3s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .hidden{display:none!important}
+  .card-grid{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+  .kcard{background:#ffffff14;border:1px solid #ffffff2e;border-radius:14px;padding:12px 16px;min-width:150px;text-align:left;font-family:var(--read-font)}
+  .kcard b{color:#7ee0c3}
+  footer{text-align:center;color:var(--soft);font-size:12px;padding:10px}
+  @media (max-width:560px){.bubble{max-width:86%}header h1{font-size:15px}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🛡️ 每日一练 · 接软钉子与玩笑：不炸不怂接得住 <span class="badge">第8关</span></h1>
+  <div class="lesson-prog">
+    <div class="lp-bar"><i id="bar"></i></div>
+    <span id="pct" style="font-size:13px">0%</span>
+  </div>
+  <div class="score">⭐ 得分 <span id="score">0</span></div>
+</header>
+
+<main>
+  <div class="stage" id="stage">
+    <div class="hint" id="stageHint">点击「开始上课」，听晓晓老师用神经网络语音一句句讲～</div>
+  </div>
+
+  <div class="caption">
+    <div class="caption-bar">
+      <span class="who" id="capWho">字幕</span>
+      <span class="txt" id="capTxt">准备好了吗？语音讲解会显示字幕在这里，不会挡住上面的画面。进度条可以随意拖动。</span>
+    </div>
+  </div>
+
+  <!-- 可拖动播放进度条 -->
+  <div class="player">
+    <div class="seek-wrap">
+      <span class="time" id="curTime">0:00</span>
+      <input type="range" class="seek" id="seek" min="0" max="1000" value="0" step="1" aria-label="播放进度，可拖动">
+      <span class="time" id="durTime">0:00</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prevBtn" disabled>⏮ 上一句</button>
+    <button class="btn" id="back5">⏪ 5秒</button>
+    <button class="btn primary" id="playBtn">▶ 开始上课</button>
+    <button class="btn" id="fwd5">5秒 ⏩</button>
+    <button class="btn" id="nextBtn" disabled>下一句 ⏭</button>
+  </div>
+  <div class="controls" style="padding-top:0">
+    <label class="toggle"><input type="checkbox" id="autoChk" checked> 自动连播</label>
+    <label class="toggle"><input type="checkbox" id="capChk" checked> 字幕</label>
+    <label class="rate">语速
+      <select id="rateSel">
+        <option value="0.75">0.75×</option>
+        <option value="0.9">0.9×</option>
+        <option value="1" selected>1.0×</option>
+        <option value="1.25">1.25×</option>
+        <option value="1.5">1.5×</option>
+      </select>
+    </label>
+  </div>
+</main>
+
+<footer>善意玩笑笑着接 · 软钉子不接招 · 缓冲一句争时间 · 晓晓老师陪你练</footer>
+
+<div class="overlay" id="introOverlay">
+  <div class="big">🛡️✨</div>
+  <h2>今天练：别人说话带刺、拿你开玩笑，怎么接住（不炸、不怂）</h2>
+  <p>第7关工具箱背了，今天直接上最难的一关。晓晓老师用<b>神经网络语音</b>一句句讲：怎么<b>分清善意玩笑和软钉子</b>、<b>缓冲句争时间</b>、<b>场景预设卡</b>、<b>角色扮演三层练</b>、<b>话别说满不反呛</b>、<b>找榜样偷师（汪涵怎么接软钉子）</b>、<b>向书学</b>、<b>三问自查</b>。每讲一件配一张<b>案例图</b>，看着不枯燥。中途会<b>随时抽查</b>、带你<b>费曼复述</b>。进度条能随便拖，听不清就往回拉！</p>
+  <button class="btn primary" id="startBtn" style="font-size:17px;padding:14px 30px">🚀 开始上课</button>
+  <p style="font-size:13px;color:#9fd9cd">建议戴耳机；字幕在底部，不挡画面；宋体大字，看得清。</p>
+</div>
+
+<div class="overlay hidden" id="endOverlay">
+  <div class="big">🏆</div>
+  <h2>这一关，你过了！</h2>
+  <p id="endMsg"></p>
+  <div class="card-grid" id="endCards"></div>
+  <button class="btn primary" id="replayBtn" style="font-size:16px;padding:12px 26px">🔁 再练一遍</button>
+</div>
+
+<script>
+/* ===== 案例图（SVG 插图，初中生也能看懂） ===== */
+const ILL_KIND = `<svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="善意玩笑与软钉子对比">
+  <rect x="0" y="0" width="680" height="300" rx="14" fill="#f2f8ff"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#1f5e57">先分清两种话（这一步最关键）</text>
+  <g font-family="SimSun,serif">
+    <rect x="24" y="46" width="312" height="226" rx="14" fill="#fff" stroke="#c9ecd6"/>
+    <rect x="24" y="46" width="312" height="34" rx="14" fill="#33b679"/><rect x="24" y="66" width="312" height="14" fill="#33b679"/>
+    <text x="40" y="70" font-size="17" font-weight="700" fill="#fff">😄 善意玩笑</text>
+    <text x="40" y="112" font-size="15" fill="#21303a">· 朋友笑着闹你，没恶意</text>
+    <text x="40" y="142" font-size="15" fill="#21303a">· 例：“今天又穿反袜子啦”</text>
+    <text x="40" y="186" font-size="16" font-weight="700" fill="#1f5e57">接法：笑着接，甚至自嘲</text>
+    <text x="40" y="216" font-size="15" fill="#5b6b8c">“是啊，我和床难舍难分”</text>
+    <text x="40" y="252" font-size="14" fill="#33b679">→ 气氛一下松了</text>
+    <rect x="344" y="46" width="312" height="226" rx="14" fill="#fff" stroke="#ffd0b8"/>
+    <rect x="344" y="46" width="312" height="34" rx="14" fill="#ff7043"/><rect x="344" y="66" width="312" height="14" fill="#ff7043"/>
+    <text x="360" y="70" font-size="17" font-weight="700" fill="#fff">🗡️ 软钉子</text>
+    <text x="360" y="112" font-size="15" fill="#21303a">· 话里带刺、带酸、带陷阱</text>
+    <text x="360" y="142" font-size="15" fill="#21303a">· 例：“就你这水平还想上榜？”</text>
+    <text x="360" y="186" font-size="16" font-weight="700" fill="#b3261e">接法：不接招、不反驳</text>
+    <text x="360" y="216" font-size="15" fill="#5b6b8c">“哦？是吗”把球抛回去</text>
+    <text x="360" y="252" font-size="14" fill="#ff7043">→ 他没着力点，自己泄气</text>
+  </g>
+</svg>`;
+
+const ILL_BUF = `<svg viewBox="0 0 680 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="缓冲句三类">
+  <rect x="0" y="0" width="680" height="280" rx="14" fill="#f2f8ff"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#1f5e57">第一招 · 缓冲句争时间（先别回怼）</text>
+  <g font-family="SimSun,serif" font-size="15">
+    <rect x="24" y="48" width="200" height="200" rx="12" fill="#fff" stroke="#ffd0b8"/>
+    <rect x="24" y="48" width="200" height="32" rx="12" fill="#ff7043"/><rect x="24" y="64" width="200" height="16" fill="#ff7043"/>
+    <text x="38" y="70" font-size="16" font-weight="700" fill="#fff">① 没听清/没反应</text>
+    <text x="38" y="108" fill="#21303a">“你这话有意思，</text>
+    <text x="38" y="132" fill="#21303a">让我想想。”</text>
+    <text x="38" y="200" font-size="13" fill="#5b6b8c">→ 赢得几秒</text>
+    <text x="38" y="224" font-size="13" fill="#5b6b8c">脑子开机</text>
+    <rect x="240" y="48" width="200" height="200" rx="12" fill="#fff" stroke="#bcd9f6"/>
+    <rect x="240" y="48" width="200" height="32" rx="12" fill="#0288d1"/><rect x="240" y="64" width="200" height="16" fill="#0288d1"/>
+    <text x="254" y="70" font-size="16" font-weight="700" fill="#fff">② 不想接这茬</text>
+    <text x="254" y="108" fill="#21303a">“哈哈这话</text>
+    <text x="254" y="132" fill="#21303a">我记下了。”</text>
+    <text x="254" y="200" font-size="13" fill="#5b6b8c">→ 不冷场</text>
+    <text x="254" y="224" font-size="13" fill="#5b6b8c">也不硬接</text>
+    <rect x="456" y="48" width="200" height="200" rx="12" fill="#fff" stroke="#c9ecd6"/>
+    <rect x="456" y="48" width="200" height="32" rx="12" fill="#33b679"/><rect x="456" y="64" width="200" height="16" fill="#33b679"/>
+    <text x="470" y="70" font-size="16" font-weight="700" fill="#fff">③ 不想答</text>
+    <text x="470" y="108" fill="#21303a">“这个咱先不聊，</text>
+    <text x="470" y="132" fill="#21303a">换个话题？”</text>
+    <text x="470" y="200" font-size="13" fill="#5b6b8c">→ 温柔挡回</text>
+    <text x="470" y="224" font-size="13" fill="#5b6b8c">不伤和气</text>
+  </g>
+</svg>`;
+
+const ILL_CARD = `<svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="场景预设填空卡">
+  <rect x="0" y="0" width="680" height="300" rx="14" fill="#fff8ec"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#a9650a">第三招 · 场景预设填空卡（提前写好，遇事掏卡）</text>
+  <g font-family="SimSun,serif" font-size="16">
+    <rect x="40" y="48" width="600" height="58" rx="12" fill="#fff" stroke="#ffd28a"/>
+    <text x="60" y="74" fill="#a9650a" font-weight="700">场景</text><text x="120" y="74" fill="#21303a">被起外号</text>
+    <text x="360" y="74" fill="#a9650a" font-weight="700">→ 回应</text><text x="440" y="74" fill="#1f5e57" font-weight="700">“这名儿还挺顺口”</text>
+    <rect x="40" y="116" width="600" height="58" rx="12" fill="#fff" stroke="#ffd28a"/>
+    <text x="60" y="142" fill="#a9650a" font-weight="700">场景</text><text x="120" y="142" fill="#21303a">被当众损“你这就不行了”</text>
+    <text x="360" y="142" fill="#a9650a" font-weight="700">→ 回应</text><text x="440" y="142" fill="#1f5e57" font-weight="700">“确实还在练，多谢提醒”</text>
+    <rect x="40" y="184" width="600" height="58" rx="12" fill="#fff" stroke="#ffd28a"/>
+    <text x="60" y="210" fill="#a9650a" font-weight="700">场景</text><text x="120" y="210" fill="#21303a">被酸“就你这水平”</text>
+    <text x="360" y="210" fill="#a9650a" font-weight="700">→ 回应</text><text x="440" y="210" fill="#1f5e57" font-weight="700">“我还在学，你有什么建议吗”</text>
+    <text x="40" y="286" font-size="13" fill="#5b6b8c">挑场景三招：常（常遇到）· 怕（最怕）· 卡（上次卡住）——各写一句存备忘录。</text>
+  </g>
+</svg>`;
+
+const ILL_ROLE = `<svg viewBox="0 0 680 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="角色扮演三层练">
+  <rect x="0" y="0" width="680" height="230" rx="14" fill="#f2f8ff"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#1f5e57">第四招 · 角色扮演三层练（接住→化解→反转）</text>
+  <g font-family="SimSun,serif" font-size="15" text-anchor="middle">
+    <rect x="24" y="56" width="180" height="100" rx="12" fill="#fff" stroke="#ffd0b8"/><text x="114" y="94" fill="#ff7043" font-weight="700" font-size="17">① 接住</text><text x="114" y="120" fill="#5b6b8c">不沉默</text><text x="114" y="140" fill="#5b6b8c">也不炸</text>
+    <text x="224" y="110" fill="#1f5e57" font-size="22" font-weight="700">➜</text>
+    <rect x="250" y="56" width="180" height="100" rx="12" fill="#fff" stroke="#bcd9f6"/><text x="340" y="94" fill="#0288d1" font-weight="700" font-size="17">② 化解</text><text x="340" y="120" fill="#5b6b8c">缓冲或自嘲</text><text x="340" y="140" fill="#5b6b8c">松开气氛</text>
+    <text x="450" y="110" fill="#1f5e57" font-size="22" font-weight="700">➜</text>
+    <rect x="476" y="56" width="180" height="100" rx="12" fill="#fff" stroke="#c9ecd6"/><text x="566" y="94" fill="#33b679" font-weight="700" font-size="17">③ 反转</text><text x="566" y="120" fill="#5b6b8c">引向别处</text><text x="566" y="140" fill="#5b6b8c">或抛回对方</text>
+    <text x="340" y="200" font-size="13" fill="#5b6b8c">练法四步：热身 → 上场(朋友演“损人精”) → 复盘 → 鼓励。没人陪练？对镜练、用AI模拟也行。</text>
+  </g>
+</svg>`;
+
+const ILL_HERO = `<svg viewBox="0 0 680 290" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="榜样：汪涵接软钉子">
+  <rect x="0" y="0" width="680" height="290" rx="14" fill="#f2f8ff"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#1f5e57">第六招 · 找榜样偷师：汪涵怎么接软钉子</text>
+  <g font-family="SimSun,serif" font-size="16">
+    <rect x="32" y="48" width="616" height="64" rx="12" fill="#fff" stroke="#ffd0b8"/>
+    <text x="50" y="76" fill="#ff7043" font-weight="700">🗡️ 软钉子</text>
+    <text x="170" y="76" fill="#21303a">记者挖坑：“你和何炅谁是一哥？”（怎么答都易得罪人）</text>
+    <text x="50" y="100" font-size="13" fill="#5b6b8c">陷阱：接招=认领“一哥之争”，反驳=伤和气。</text>
+    <rect x="32" y="126" width="616" height="64" rx="12" fill="#fff" stroke="#c9ecd6"/>
+    <text x="50" y="154" fill="#33b679" font-weight="700">😊 汪涵接住</text>
+    <text x="170" y="154" fill="#1f5e57" font-weight="700">“当然是何炅是一哥，我是他大哥。”</text>
+    <text x="50" y="178" font-size="13" fill="#5b6b8c">不接招、不反驳，还顺手给足对方面子。</text>
+    <rect x="32" y="204" width="616" height="64" rx="12" fill="#fff" stroke="#bcd9f6"/>
+    <text x="50" y="232" fill="#0288d1" font-weight="700">✨ 效果</text>
+    <text x="170" y="232" fill="#21303a">幽默+格局，把软钉子化成一笑；关系反而更近。</text>
+    <text x="50" y="256" font-size="13" fill="#5b6b8c">贾玲接催婚也用自嘲：“那给我一个。”——把追问化掉，逗乐全场。</text>
+  </g>
+</svg>`;
+
+const ILL_MIRROR = `<svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="三问自查镜">
+  <rect x="0" y="0" width="680" height="300" rx="14" fill="#f2f8ff"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#1f5e57">第七招 · 三问自查镜（回怼前照一照）</text>
+  <ellipse cx="210" cy="165" rx="120" ry="105" fill="#eaf6f2" stroke="#1f5e57" stroke-width="6"/>
+  <ellipse cx="210" cy="165" rx="92" ry="80" fill="#fff" stroke="#bcd9f6"/>
+  <text x="210" y="150" text-anchor="middle" font-family="SimSun,serif" font-size="34" fill="#1f5e57" font-weight="700">?</text>
+  <text x="210" y="190" text-anchor="middle" font-family="SimSun,serif" font-size="22" fill="#33b679" font-weight="700">照镜</text>
+  <g font-family="SimSun,serif" font-size="17">
+    <rect x="370" y="56" width="280" height="60" rx="12" fill="#fff" stroke="#c9ecd6"/>
+    <text x="390" y="84" fill="#33b679" font-weight="700">① 该说吗？</text><text x="500" y="84" fill="#5b6b8c" font-size="14">必要的，还是面子挂不住？</text>
+    <rect x="370" y="128" width="280" height="60" rx="12" fill="#fff" stroke="#c9ecd6"/>
+    <text x="390" y="156" fill="#33b679" font-weight="700">② 负责吗？</text><text x="500" y="156" fill="#5b6b8c" font-size="14">这话会不会伤人？</text>
+    <rect x="370" y="200" width="280" height="60" rx="12" fill="#fff" stroke="#c9ecd6"/>
+    <text x="390" y="228" fill="#33b679" font-weight="700">③ 能补吗？</text><text x="500" y="228" fill="#5b6b8c" font-size="14">说出去收得回吗？</text>
+  </g>
+  <text x="340" y="288" text-anchor="middle" font-size="13" fill="#5b6b8c">三问过一遍，再默念一二三，火气就降了。</text>
+</svg>`;
+
+/* ===== 课程步骤（sub=字幕；id=音频文件名；svg=案例图） ===== */
+const STEPS = [
+  {id:"t01",sp:"teacher",sub:"同学们好，我是晓晓老师，欢迎回到不冒失修炼课。昨天第7关我们做了随身工具箱：万能缓冲句、话别说满替换表、场景预设卡、榜样观察册、角色扮演、向书学、三问自查镜。今天第8关，专门练一种最磨人的场面——别人说话带刺，或者拿你开玩笑，你怎么接住，既不炸毛也不认怂。"},
+  {id:"t02",sp:"student",sub:"老师，这个我太需要了！我同学就爱当众损我、给我起外号，我一急就回怼，结果越吵越僵，回头又后悔。"},
+  {id:"t03",sp:"teacher",sub:"小明这个烦恼太普遍了。我们先分清两种话：一种是善意玩笑，朋友笑着闹你，没恶意；另一种是软钉子，话里带刺、带酸、带陷阱，想看你出丑。接法不一样。先记今天总口诀：善意玩笑笑着接，软钉子来不接招。缓冲一句争时间，场景预设心里苗。角色扮演三层练，找榜样来偷师巧。话别说满不反呛，三问自查稳又牢。",svg:ILL_KIND},
+  {id:"t04",sp:"teacher",sub:"第一招：缓冲句争取时间。不管是玩笑还是软钉子，一时接不住，先别张嘴回怼，用一句缓冲句把球接住。分三类：没听清、没反应过来，就说「你这话有意思，让我想想」；不想接这茬，就说「哈哈这话我记下了」；不想答，就说「这个咱先不聊，换个话题？」。赢得这几秒，脑子就开机了。",svg:ILL_BUF},
+  {id:"t05",sp:"student",sub:"老师，那要是他明显在酸我、阴阳怪气呢？比如「就你这水平还想上榜？」"},
+  {id:"t06",sp:"teacher",sub:"问到点子上了！这种就是软钉子。第二招：判断善意还是恶意，用不同法子。善意玩笑，笑着接，甚至自嘲；恶意软钉子，不接招、不反驳、不认怂，用「哦？」「是吗」「你这么觉得呀」把球轻轻抛回去，他没着力点，自己就泄了气。口诀：善意玩笑笑着接，恶意软钉子不接招。"},
+  {id:"t07",sp:"teacher",sub:"第三招：场景预设填空卡。提前给高频的带刺或玩笑场面写好回应，现场直接掏卡。看这张卡：被起外号，就说「这名儿还挺顺口」；被当众损「你这就不行了」，就说「确实还在练，多谢提醒」；被酸「就你这水平」，就说「我还在学，你有什么建议吗」。把空白卡写好，遇事不抓瞎。",svg:ILL_CARD},
+  {id:"t08",sp:"student",sub:"老师，这些场面我怎么提前想到啊？"},
+  {id:"t09",sp:"teacher",sub:"还是那三个字：常、怕、卡。常，是你常被开玩笑的点；怕，是你最怕被说的短板；卡，是上次没接住、事后后悔的那次。把这三类的万能回应各写一句，存进手机备忘录，就是你的预设卡。口诀：常怕卡，先写卡，遇事掏卡不抓瞎。"},
+  {id:"t10",sp:"teacher",sub:"第四招：角色扮演三层练。把接软钉子练成三层反应：第一层接住——不沉默也不炸；第二层化解——一句缓冲或自嘲把气氛松开；第三层反转——把话题轻轻引向别处，或者抛回对方。练法还是四步：热身、上场（朋友演损人精你接招）、复盘、鼓励。",svg:ILL_ROLE},
+  {id:"t11",sp:"student",sub:"老师，万一练了，真到现场还是卡壳接不住呢？"},
+  {id:"t12",sp:"teacher",sub:"那用第五招：话别说满、不反呛。很多人一急就回「你才XX呢」「你懂什么」，这是反呛，话还说得满，等于往火上浇油。换成「可能我表达得不清楚」「我理解你的意思，不过我有点不同看法」，留余地，也是给自己留后路。口诀：话到嘴边缓一缓，反呛一句全崩盘。"},
+  {id:"t13",sp:"teacher",sub:"第六招：找榜样偷师。你身边那个被损也不急、开玩笑也接得住的人，就是现成教材。看名人也有样板：主持人汪涵被记者挖坑「你和何炅谁是一哥」，这是典型的软钉子。汪涵笑着答：「当然是何炅是一哥，我是他大哥。」既没接招、没反驳，又给足对方面子，还顺便拉近关系。你看，软钉子靠幽默和格局接住。",svg:ILL_HERO},
+  {id:"t14",sp:"student",sub:"老师，我身边真没这种人，书里也没这么细的啊。"},
+  {id:"t15",sp:"teacher",sub:"那就向书、向故事学。没有榜样，书里到处是。《非暴力沟通》说：不评判、说事实；《人性的弱点》说：让对方多说，别急着证明自己对。还有讲幽默化解的书，看别人怎么自嘲、怎么接梗。看一遍别人踩的坑、怎么补，等于你先试错一次。口诀：没榜样，看书闯，别人踩坑我成长。"},
+  {id:"t16",sp:"teacher",sub:"第七招：三问自查镜。开口回怼前，先照镜子问自己：该说吗——是必要的，还是我面子挂不住？负责吗——这话会不会伤人、我担得起吗？能补吗——说出去收得回吗？三问过一遍，再默念一二三，火气就降了。",svg:ILL_MIRROR},
+  {id:"t17",sp:"teacher",sub:"再送你一个睡前小妙招：复盘日记。睡前五分钟，想想今天谁损了你、你接得怎样；重来你会怎么接（掏出今天的预设卡）；记一句下次能用上的。把后悔变经验。口诀：睡前五分钟，复盘变神功。"},
+
+  {id:"t18",sp:"teacher",sub:"好，晓晓老师抽查第一题：同学笑着损你「今天又穿反袜子啦」，这明显是善意玩笑，哪句最得体？A，「你才眼瞎」；B，「哈哈被你发现了，我主打一个随性」；C，「关你什么事」。想好了再选。",type:"quiz",
+    q:"同学笑着损你「今天又穿反袜子啦」，明显是善意玩笑，哪句最得体？",
+    opts:["“你才眼瞎。”","“哈哈被你发现了，我主打一个随性。”","“关你什么事。”"],
+    ans:1, exp:"B 善意玩笑笑着接、自嘲，气氛轻松；A、C 把玩笑当欺负，反而伤感情。"},
+  {id:"t19",sp:"teacher",sub:"第二题：有人酸你「就你这水平还想上榜」，哪句最稳？A，「你懂什么，我肯定行」；B，「我还在学，你有什么建议吗」；C，「上榜就上榜，你少管」。",type:"quiz",
+    q:"有人酸你「就你这水平还想上榜」，哪句最稳、最不接招？",
+    opts:["你懂什么，我肯定行","我还在学，你有什么建议吗","上榜就上榜，你少管"],
+    ans:1, exp:"B 不接招也不认怂，还把球抛回请建议；A 反呛说满、C 硬杠，都容易吵起来。"},
+
+  {id:"t20",sp:"teacher",sub:"应用题来啦，小明。朋友突然当众给你起外号，你其实不喜欢。请用今天学的缓冲句加场景预设，写一句你会怎么说，记得不炸也不怂。写下来或者大声说出来都行。",type:"feynman",
+    q:"应用题：朋友突然当众给你起外号，你其实不喜欢。请用「缓冲句 + 场景预设」写一句你会怎么说（不炸也不怂）。",
+    ref:"参考：「这名儿还挺顺口，不过我更爱大家叫我本名。」——缓冲句先接住、不炸，再用场景预设温和表达真实感受，不怂也不伤和气。"},
+  {id:"t21",sp:"teacher",sub:"最后是费曼复述挑战：假装你是老师，用自己的话讲一遍——善意玩笑和软钉子怎么区分？各用什么招接住？讲不明白就是没真懂，多讲两遍就通了。",type:"feynman",
+    q:"费曼复述：用你自己的话，给别人讲一遍——善意玩笑和软钉子怎么区分？各用什么招接住？写下来或说给家人听。",
+    ref:"参考：善意玩笑是朋友闹着玩、没恶意，笑着接甚至自嘲（如「我和床难舍难分」）；软钉子是话里带刺带陷阱，不接招、不反驳，用「哦？是吗」把球抛回去（如汪涵接「一哥」之问）。讲不明白就是还没真懂，多讲两遍就通了！"},
+
+  {id:"t22",sp:"teacher",sub:"今天总口诀送给你：说话带刺别慌张，第8关里练接招。善意玩笑笑着接，软钉子来不接招。缓冲一句争时间，场景预设心里苗。角色扮演三层练，找榜样来偷师巧。话别说满不反呛，三问自查稳又牢。天天复盘变神功，嘴巴听话不闯祸！"},
+  {id:"t23",sp:"student",sub:"老师我懂了！以后被损先不炸，善意玩笑笑着接，软钉子回个「是吗」把球抛回去，话不说满，还去偷师汪涵！"},
+  {id:"t24",sp:"teacher",sub:"太棒了小明！记住：带刺的话，接得住才是真本事。工具箱天天摸，招式才变肌肉记忆。今天第8关过了，明天见下一关！"},
+];
+
+/* ===== 不定时随机抽查题库（自动连播时会在某一句后突然弹出） ===== */
+const BONUS_POOL = [
+  {q:"（突击）朋友笑着损你「你这发型像鸡窝」，这是善意玩笑，哪句最得体？",opts:["你才像","哈哈今天主打狂野风","关你屁事"],ans:1,
+   exp:"B 笑着接、自嘲，气氛轻松；A、C 把玩笑当欺负，反而尴尬。"},
+  {q:"（突击）有人酸你「就你这成绩还想考重点」，哪句最稳？",opts:["我肯定行你等着","我还在努力，有啥建议吗","考不上关你事"],ans:1,
+   exp:"B 不接招、留余地、还请对方建议；A 说满、C 硬杠，都容易吵起来。"},
+  {q:"（突击）朋友当众给你起外号，你其实不喜欢，第一步最得体的是？",opts:["闭嘴别叫我","这名儿挺顺口，不过我更爱大家叫我本名","你才应该叫这名字"],ans:1,
+   exp:"B 先用缓冲句接住不炸，再温和表达真实感受，不怂也不伤和气；A 太冲、C 反呛，都激化矛盾。"},
+];
+const NARR_IDX = STEPS.map((s,i)=>i).filter(i=>!STEPS[i].type);
+const bonusPos = NARR_IDX[Math.floor(Math.random()*(NARR_IDX.length-6))+3];
+const bonusQ = BONUS_POOL[Math.floor(Math.random()*BONUS_POOL.length)];
+
+/* ===== 元素 ===== */
+const stage=document.getElementById('stage'), capTxt=document.getElementById('capTxt'), capWho=document.getElementById('capWho');
+const bar=document.getElementById('bar'), pct=document.getElementById('pct'), scoreEl=document.getElementById('score');
+const playBtn=document.getElementById('playBtn'), prevBtn=document.getElementById('prevBtn'), nextBtn=document.getElementById('nextBtn');
+const autoChk=document.getElementById('autoChk'), capChk=document.getElementById('capChk'), rateSel=document.getElementById('rateSel');
+const seek=document.getElementById('seek'), curTime=document.getElementById('curTime'), durTime=document.getElementById('durTime');
+const back5=document.getElementById('back5'), fwd5=document.getElementById('fwd5');
+
+let cur=-1, score=0, audio=new Audio(), playing=false, autoTimer=null, bonusUsed=false, seeking=false;
+
+function fmt(t){ if(!isFinite(t)||t<0)t=0; const m=Math.floor(t/60), s=Math.floor(t%60); return m+':'+(s<10?'0':'')+s; }
+function setLessonProg(){ const p=Math.round((cur+1)/STEPS.length*100); bar.style.width=p+'%'; pct.textContent=p+'%'; }
+function setCap(sp,txt){ if(!capChk.checked){capTxt.textContent='（字幕已关闭）';capWho.textContent='字幕';return;} capWho.textContent=sp==='teacher'?'晓晓老师':'小明同学'; capTxt.textContent=txt; }
+function clearStage(){ stage.innerHTML=''; document.getElementById('stageHint')?.remove(); }
+function paintSeek(){ const v=(+seek.value)/1000*100; seek.style.background=`linear-gradient(90deg,#2e9e8a ${v}%, #e6ecf5 ${v}%)`; }
+
+function renderStep(i,isBonus=false){
+  clearStage();
+  if(isBonus){ renderQuiz(bonusQ,()=>advance(),true); setCap('teacher','（不定时抽查）'+bonusQ.q); return; }
+  const s=STEPS[i];
+  const row=document.createElement('div'); row.className='row '+(s.sp==='student'?'student':'');
+  const av=document.createElement('div'); av.className='avatar '+(s.sp==='student'?'student':'teacher'); av.textContent=s.sp==='student'?'明':'晓';
+  const col=document.createElement('div');
+  const name=document.createElement('div'); name.className='name'; name.textContent=s.sp==='student'?'小明同学':'晓晓老师';
+  const bub=document.createElement('div'); bub.className='bubble'; bub.textContent=s.sub;
+  col.appendChild(name); col.appendChild(bub); row.appendChild(av); row.appendChild(col); stage.appendChild(row);
+  if(s.svg){
+    const illu=document.createElement('div'); illu.className='illu';
+    illu.innerHTML=s.svg;
+    stage.appendChild(illu);
+  }
+  setCap(s.sp,s.sub);
+  if(s.type==='quiz'){ renderQuiz(s,()=>afterNarration(i)); }
+  else if(s.type==='feynman'){ renderFeynman(s,()=>afterNarration(i)); }
+  setLessonProg();
+  prevBtn.disabled=(i<=0); nextBtn.disabled=(i>=STEPS.length-1);
+}
+function renderQuiz(q,onDone,isBonus){
+  const box=document.createElement('div'); box.className='quiz';
+  box.innerHTML='<h3>📝 '+(isBonus?'不定时突击抽查':'晓晓老师抽查')+'</h3>';
+  const h=document.createElement('div'); h.style.cssText='font-size:17px;line-height:1.8;margin-bottom:6px;font-family:var(--read-font)'; h.textContent=q.q; box.appendChild(h);
+  q.opts.forEach((o,idx)=>{
+    const b=document.createElement('button'); b.className='opt'; b.textContent=o;
+    b.onclick=()=>{
+      box.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+      if(idx===q.ans){ b.classList.add('correct'); addScore(10); } else { b.classList.add('wrong'); box.querySelectorAll('.opt')[q.ans].classList.add('correct'); }
+      const e=document.createElement('div'); e.className='explain show'; e.textContent='💡 '+q.exp; box.appendChild(e);
+      const nb=document.createElement('button'); nb.className='btn primary mini'; nb.textContent='继续 ▶'; nb.style.marginTop='10px'; nb.onclick=()=>onDone(); box.appendChild(nb);
+    };
+    box.appendChild(b);
+  });
+  stage.appendChild(box);
+}
+function renderFeynman(s,onDone){
+  const box=document.createElement('div'); box.className='feynman';
+  box.innerHTML='<h3>🎤 '+(s.q.indexOf('费曼')>=0?'费曼复述挑战':'应用挑战')+'</h3>';
+  const p=document.createElement('div'); p.style.cssText='font-size:17px;line-height:1.8;margin-bottom:8px;font-family:var(--read-font)'; p.textContent=s.q; box.appendChild(p);
+  const ta=document.createElement('textarea'); ta.placeholder='用自己的话写下来，或大声说出来后点下面的按钮…'; box.appendChild(ta);
+  const rb=document.createElement('button'); rb.className='btn mini'; rb.textContent='👀 看参考答案';
+  const ref=document.createElement('div'); ref.className='ref'; ref.textContent=s.ref; rb.onclick=()=>ref.classList.add('show');
+  const nb=document.createElement('button'); nb.className='btn primary mini'; nb.textContent='我已复述，继续 ▶'; nb.style.marginLeft='8px'; nb.onclick=()=>{ addScore(5); onDone(); };
+  const wrap=document.createElement('div'); wrap.style.marginTop='10px'; wrap.appendChild(rb); wrap.appendChild(nb); box.appendChild(wrap); box.appendChild(ref);
+  stage.appendChild(box);
+}
+function addScore(n){ score+=n; scoreEl.textContent=score; }
+
+/* ===== 音频引擎 ===== */
+function loadAndPlay(i){
+  playing=true; playBtn.textContent='⏸ 暂停';
+  audio.src='audio_d0719/'+STEPS[i].id+'.mp3';
+  audio.playbackRate=parseFloat(rateSel.value);
+  audio.play().catch(()=>{ playBtn.textContent='▶ 播放'; });
+}
+audio.addEventListener('loadedmetadata',()=>{ durTime.textContent=fmt(audio.duration); });
+audio.addEventListener('timeupdate',()=>{
+  if(seeking) return;
+  curTime.textContent=fmt(audio.currentTime);
+  if(audio.duration){ seek.value=Math.round(audio.currentTime/audio.duration*1000); paintSeek(); }
+});
+audio.addEventListener('ended',()=>{
+  playing=false; playBtn.textContent='▶ 重播这句';
+  const i=cur;
+  if(autoChk.checked && !STEPS[i].type){
+    if(!bonusUsed && i===bonusPos){ bonusUsed=true; setTimeout(()=>renderStep(i,true),400); return; }
+    autoTimer=setTimeout(()=>advance(),450);
+  }
+});
+/* 拖动进度条：随意调播放位置 */
+seek.addEventListener('input',()=>{ seeking=true; paintSeek(); if(audio.duration){ curTime.textContent=fmt((+seek.value)/1000*audio.duration); } });
+seek.addEventListener('change',()=>{ if(audio.duration){ audio.currentTime=(+seek.value)/1000*audio.duration; } seeking=false; });
+back5.onclick=()=>{ audio.currentTime=Math.max(0,audio.currentTime-5); };
+fwd5.onclick=()=>{ if(audio.duration) audio.currentTime=Math.min(audio.duration,audio.currentTime+5); };
+rateSel.onchange=()=>{ audio.playbackRate=parseFloat(rateSel.value); };
+
+function advance(){ if(cur>=STEPS.length-1){ finish(); return; }
+  cur++; renderStep(cur); loadAndPlay(cur); }
+function afterNarration(i){ if(autoChk.checked){ autoTimer=setTimeout(()=>advance(),400); } }
+function goStep(i){ cur=i; renderStep(cur); loadAndPlay(cur); }
+function resetSeek(){ audio.pause(); seek.value=0; paintSeek(); curTime.textContent='0:00'; durTime.textContent='0:00'; playing=false; playBtn.textContent='▶ 播放'; }
+
+function finish(){
+  clearStage(); resetSeek();
+  document.getElementById('endOverlay').classList.remove('hidden');
+  document.getElementById('endMsg').innerHTML='你练完了「接软钉子与玩笑：不炸、不怂、接得住」这一关，本次得分 ⭐ <b>'+score+'</b>。真正学会的标志：<b>下次被损，你先不炸；善意玩笑笑着接，软钉子回个「是吗」把球抛回去；话到嘴边，把「你懂什么」换成「我还在学」。</b>';
+  document.getElementById('endCards').innerHTML=`
+    <div class="kcard"><b>① 分清两种话</b><br>善意玩笑笑着接<br>软钉子不接招</div>
+    <div class="kcard"><b>② 缓冲句争时间</b><br>你这话有意思<br>让我想想</div>
+    <div class="kcard"><b>③ 场景预设卡</b><br>常怕卡·先写卡<br>遇事掏卡</div>
+    <div class="kcard"><b>④ 角色扮演三层</b><br>接住·化解·反转</div>
+    <div class="kcard"><b>⑤ 话别说满不反呛</b><br>反呛一句全崩盘</div>
+    <div class="kcard"><b>⑥ 找榜样偷师</b><br>汪涵接软钉子</div>
+    <div class="kcard"><b>⑦ 向书学</b><br>没榜样·看书闯</div>
+    <div class="kcard"><b>⑧ 三问自查镜</b><br>该说吗·负责吗<br>能补吗</div>`;
+  bar.style.width='100%'; pct.textContent='100%';
+}
+
+/* 控件 */
+playBtn.onclick=()=>{
+  if(cur<0){ advance(); return; }
+  if(playing){ audio.pause(); playing=false; playBtn.textContent='▶ 继续'; }
+  else { playing=true; playBtn.textContent='⏸ 暂停'; audio.play().catch(()=>{}); }
+};
+nextBtn.onclick=()=>{ if(cur<STEPS.length-1){ clearTimeout(autoTimer); advance(); } };
+prevBtn.onclick=()=>{ if(cur>0){ clearTimeout(autoTimer); goStep(cur-1); } };
+document.getElementById('startBtn').onclick=()=>{ document.getElementById('introOverlay').classList.add('hidden'); advance(); };
+document.getElementById('replayBtn').onclick=()=>{ document.getElementById('endOverlay').classList.add('hidden'); cur=-1; score=0; scoreEl.textContent=0; bonusUsed=false; advance(); };
+capChk.onchange=()=>{ if(cur>=0 && STEPS[cur]) setCap(STEPS[cur].sp,STEPS[cur].sub); };
+paintSeek();
+</script>
+</body>
+</html>
