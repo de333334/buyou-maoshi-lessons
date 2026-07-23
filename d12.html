@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日一练 · 开口前在脑子里"打草稿"：先把话排好再出口 — 晓晓老师</title>
+<style>
+  :root{
+    --bg1:#eaf6f2; --bg2:#eef0fe; --board:#1f5e57;
+    --ink:#21303a; --soft:#5b6b8c; --good:#33b679; --bad:#ef5350; --gold:#ffb300;
+    --teacher:#ff7043; --student:#0288d1;
+    --read-font:"SimSun","宋体","Songti SC","STSong",serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+    background:linear-gradient(160deg,var(--bg1),var(--bg2));
+    color:var(--ink);display:flex;flex-direction:column;min-height:100vh;
+  }
+  header{
+    background:var(--board);color:#fff;padding:12px 18px;display:flex;
+    align-items:center;gap:14px;flex-wrap:wrap;box-shadow:0 4px 14px rgba(0,0,0,.18);
+    position:sticky;top:0;z-index:5;
+  }
+  header h1{font-size:18px;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
+  .badge{background:var(--gold);color:#5a4500;font-size:12px;padding:2px 9px;border-radius:20px;font-weight:700}
+  .lesson-prog{flex:1;min-width:150px;display:flex;align-items:center;gap:8px}
+  .lp-bar{flex:1;height:8px;background:#ffffff33;border-radius:20px;overflow:hidden}
+  .lp-bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7ee0c3,#2e9e8a);transition:width .4s}
+  .score{background:#ffffff22;padding:4px 10px;border-radius:20px;font-size:13px;white-space:nowrap}
+  main{flex:1;display:flex;flex-direction:column;padding:16px 16px 8px;max-width:920px;width:100%;margin:0 auto}
+  .stage{
+    flex:1;background:#fff;border-radius:18px;box-shadow:0 8px 26px rgba(60,80,120,.14);
+    padding:18px;display:flex;flex-direction:column;gap:14px;min-height:280px;position:relative;overflow:hidden;
+  }
+  .stage::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% -10%,#e6faf3,transparent 55%);pointer-events:none}
+  .row{display:flex;gap:12px;align-items:flex-end;z-index:1}
+  .row.student{flex-direction:row-reverse}
+  .avatar{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:22px;font-weight:800;color:#fff;flex:0 0 auto;box-shadow:0 4px 10px rgba(0,0,0,.15)}
+  .avatar.teacher{background:linear-gradient(135deg,#ffb74d,#ff7043)}
+  .avatar.student{background:linear-gradient(135deg,#4fc3f7,#0288d1)}
+  .bubble{max-width:78%;background:#f4f7fb;border:1px solid #e4ebf5;border-radius:16px;padding:14px 17px;
+    line-height:1.95;font-size:18px;font-family:var(--read-font);animation:pop .35s ease}
+  .row.student .bubble{background:#e3f2fd;border-color:#cfe8fb}
+  .name{font-size:13px;color:var(--soft);margin:0 4px 4px;font-weight:700}
+  @keyframes pop{from{transform:translateY(8px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+
+  /* 案例图：插图容器 */
+  .illu{margin:2px 0 4px;background:#fbfdff;border:1px dashed #cfe0ea;border-radius:14px;padding:10px;z-index:1;animation:pop .35s ease}
+  .illu svg{width:100%;height:auto;display:block;border-radius:10px}
+  .illu .illu-cap{font-size:13px;color:var(--soft);text-align:center;margin-top:6px;font-family:var(--read-font)}
+
+  /* 底部字幕：不遮挡上方讲解 */
+  .caption{margin:12px auto 0;max-width:920px;width:100%;padding:0 16px}
+  .caption-bar{background:rgba(31,48,58,.94);color:#fff;border-radius:14px;padding:13px 17px;font-size:17px;
+    line-height:1.8;font-family:var(--read-font);display:flex;align-items:center;gap:10px;min-height:56px;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+  .caption-bar .who{font-size:12px;background:#ffffff33;padding:2px 8px;border-radius:10px;white-space:nowrap;font-family:inherit}
+  .caption-bar .txt{flex:1}
+
+  /* 可拖动的播放进度条 */
+  .player{max-width:920px;width:100%;margin:10px auto 0;padding:0 16px}
+  .seek-wrap{display:flex;align-items:center;gap:10px;background:#fff;border-radius:14px;padding:10px 14px;
+    box-shadow:0 4px 12px rgba(60,80,120,.12)}
+  .time{font-size:12px;color:var(--soft);font-variant-numeric:tabular-nums;white-space:nowrap;min-width:38px;text-align:center}
+  input[type=range].seek{
+    -webkit-appearance:none;appearance:none;flex:1;height:8px;border-radius:20px;cursor:pointer;
+    background:linear-gradient(90deg,#2e9e8a 0%, #2e9e8a 0%, #e6ecf5 0%, #e6ecf5 100%);
+  }
+  input[type=range].seek::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+    background:#1f5e57;box-shadow:0 2px 6px rgba(0,0,0,.25);cursor:pointer;border:2px solid #fff}
+  input[type=range].seek::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#1f5e57;border:2px solid #fff;cursor:pointer}
+
+  .controls{display:flex;gap:10px;align-items:center;justify-content:center;padding:12px 8px 6px;flex-wrap:wrap}
+  button.btn{border:none;border-radius:24px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;
+    background:#fff;color:var(--ink);box-shadow:0 4px 12px rgba(60,80,120,.18);transition:transform .12s,background .2s}
+  button.btn:hover{transform:translateY(-2px)}
+  button.btn.primary{background:linear-gradient(135deg,#34b89c,#1f5e57);color:#fff}
+  button.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+  .toggle{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--soft)}
+  .rate{font-size:13px;color:var(--soft);display:flex;align-items:center;gap:4px}
+  select{border:1px solid #d7dff0;border-radius:10px;padding:4px 6px;font-size:13px;color:var(--ink);background:#fff}
+
+  .quiz,.feynman{background:#fffdf6;border:2px dashed var(--gold);border-radius:16px;padding:16px;margin-top:4px;z-index:1;animation:pop .35s ease}
+  .quiz h3,.feynman h3{font-size:16px;color:#a9650a;margin-bottom:10px;display:flex;gap:6px;align-items:center}
+  .opt{display:block;width:100%;text-align:left;background:#fff;border:2px solid #f0d9a8;color:var(--ink);
+    border-radius:12px;padding:11px 14px;margin:8px 0;font-size:17px;cursor:pointer;transition:.15s;font-family:var(--read-font)}
+  .opt:hover{border-color:var(--gold)}
+  .opt.correct{background:#e6f7ee;border-color:var(--good);color:#1c7a4d;font-weight:700}
+  .opt.wrong{background:#fdecea;border-color:var(--bad);color:#b3261e}
+  .opt:disabled{cursor:default}
+  .explain{margin-top:10px;font-size:15px;line-height:1.7;color:var(--soft);background:#f6f8fc;padding:10px 12px;border-radius:10px;display:none;font-family:var(--read-font)}
+  .explain.show{display:block}
+  textarea{width:100%;min-height:92px;border:2px solid #e2e8f2;border-radius:12px;padding:12px;font-size:17px;font-family:var(--read-font);resize:vertical;line-height:1.8}
+  textarea:focus{outline:none;border-color:var(--student)}
+  .ref{margin-top:10px;font-size:15px;line-height:1.9;color:var(--ink);background:#eef7ff;border-left:4px solid var(--student);padding:12px 14px;border-radius:0 10px 10px 0;display:none;font-family:var(--read-font)}
+  .ref.show{display:block}
+  .mini{font-size:13px;padding:8px 14px}
+  .hint{font-size:14px;color:var(--soft);text-align:center;margin-top:6px;font-family:var(--read-font)}
+
+  .overlay{position:fixed;inset:0;background:linear-gradient(160deg,#1f5e57,#143a36);color:#fff;z-index:30;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;gap:16px}
+  .overlay h2{font-size:24px}
+  .overlay p{max-width:560px;line-height:1.9;color:#d6efe8;font-family:var(--read-font);font-size:17px}
+  .overlay .big{font-size:54px;animation:float 3s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .hidden{display:none!important}
+  .card-grid{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+  .kcard{background:#ffffff14;border:1px solid #ffffff2e;border-radius:14px;padding:12px 16px;min-width:150px;text-align:left;font-family:var(--read-font)}
+  .kcard b{color:#7ee0c3}
+  footer{text-align:center;color:var(--soft);font-size:12px;padding:10px}
+  @media (max-width:560px){.bubble{max-width:86%}header h1{font-size:15px}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>💬 每日一练 · 开口前在脑子里"打草稿"：先把话排好再出口 <span class="badge">第12关</span></h1>
+  <div class="lesson-prog">
+    <div class="lp-bar"><i id="bar"></i></div>
+    <span id="pct" style="font-size:13px">0%</span>
+  </div>
+  <div class="score">⭐ 得分 <span id="score">0</span></div>
+</header>
+
+<main>
+  <div class="stage" id="stage">
+    <div class="hint" id="stageHint">点击「开始上课」，听晓晓老师用神经网络语音一句句讲～</div>
+  </div>
+
+  <div class="caption">
+    <div class="caption-bar">
+      <span class="who" id="capWho">字幕</span>
+      <span class="txt" id="capTxt">准备好了吗？语音讲解会显示字幕在这里，不会挡住上面的画面。进度条可以随意拖动。</span>
+    </div>
+  </div>
+
+  <!-- 可拖动播放进度条 -->
+  <div class="player">
+    <div class="seek-wrap">
+      <span class="time" id="curTime">0:00</span>
+      <input type="range" class="seek" id="seek" min="0" max="1000" value="0" step="1" aria-label="播放进度，可拖动">
+      <span class="time" id="durTime">0:00</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prevBtn" disabled>⏮ 上一句</button>
+    <button class="btn" id="back5">⏪ 5秒</button>
+    <button class="btn primary" id="playBtn">▶ 开始上课</button>
+    <button class="btn" id="fwd5">5秒 ⏩</button>
+    <button class="btn" id="nextBtn" disabled>下一句 ⏭</button>
+  </div>
+  <div class="controls" style="padding-top:0">
+    <label class="toggle"><input type="checkbox" id="autoChk" checked> 自动连播</label>
+    <label class="toggle"><input type="checkbox" id="capChk" checked> 字幕</label>
+    <label class="rate">语速
+      <select id="rateSel">
+        <option value="0.75">0.75×</option>
+        <option value="0.9">0.9×</option>
+        <option value="1" selected>1.0×</option>
+        <option value="1.25">1.25×</option>
+        <option value="1.5">1.5×</option>
+      </select>
+    </label>
+  </div>
+</main>
+
+<footer>开口之前打草稿 · 默念三秒攒思路 · 结论先行不乱铺 · 想好再说慢半拍 · 晓晓老师陪你练</footer>
+
+<div class="overlay" id="introOverlay">
+  <div class="big">📝✋</div>
+  <h2>今天练：开口前在脑子里"打草稿"——先把话排好再出口</h2>
+  <p>第11关抢话练了，今天治更根本的毛病：<b>话到嘴边没在脑子里排过就冲出去</b>。晓晓老师用<b>神经网络语音</b>一句句讲：把每天默念的三秒升级成<b>草稿时间</b>；<b>结论先行</b>再补<b>三点支撑</b>；临场空白用<b>万能缓冲句</b>（含"我整理下思路，待会细说""这个角度我还真没想过，你接着说"）；<b>话别说满</b>（绝对→可能）；<b>场景预设卡</b>；<b>角色扮演</b>；<b>找榜样+向书学</b>（明托《金字塔原理》结论先行）；<b>三问自查镜</b>。每讲一件配一张<b>案例图</b>，看着不枯燥。中途会<b>随时抽查</b>、带你<b>费曼复述</b>。进度条能随便拖，听不清就往回拉！</p>
+  <button class="btn primary" id="startBtn" style="font-size:17px;padding:14px 30px">🚀 开始上课</button>
+  <p style="font-size:13px;color:#9fd9cd">建议戴耳机；字幕在底部，不挡画面；宋体大字，看得清。</p>
+</div>
+
+<div class="overlay hidden" id="endOverlay">
+  <div class="big">🏆</div>
+  <h2>这一关，你过了！</h2>
+  <p id="endMsg"></p>
+  <div class="card-grid" id="endCards"></div>
+  <button class="btn primary" id="replayBtn" style="font-size:16px;padding:12px 26px">🔁 再练一遍</button>
+</div>
+
+<script>
+/* ===== 案例图（SVG 插图，初中生也能看懂） ===== */
+const ILL_WHY = `<svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="为什么需要打草稿：脱口而出 vs 慢系统草稿">
+  <rect x="0" y="0" width="680" height="300" rx="14" fill="#f2f8ff"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#1f5e57">原理 · 为什么需要打草稿（脱口而出容易翻车）</text>
+  <g font-family="SimSun,serif">
+    <rect x="24" y="46" width="312" height="226" rx="14" fill="#fff" stroke="#ffd0b8"/>
+    <rect x="24" y="46" width="312" height="34" rx="14" fill="#ef5350"/><rect x="24" y="66" width="312" height="14" fill="#ef5350"/>
+    <text x="40" y="70" font-size="17" font-weight="700" fill="#fff">💥 脱口而出（快系统）</text>
+    <text x="40" y="120" font-size="22" font-weight="700" fill="#b3261e">话比脑子先冲</text>
+    <text x="40" y="158" font-size="15" fill="#21303a">· 说一半卡壳</text>
+    <text x="40" y="192" font-size="15" fill="#5b6b8c">· 把可能说成肯定</text>
+    <text x="40" y="226" font-size="15" fill="#5b6b8c">· 接错茬、跑题</text>
+    <text x="40" y="262" font-size="13" fill="#a9650a">卡尼曼：激动走快系统</text>
+    <rect x="344" y="46" width="312" height="226" rx="14" fill="#fff" stroke="#c9ecd6"/>
+    <rect x="344" y="46" width="312" height="34" rx="14" fill="#33b679"/><rect x="344" y="66" width="312" height="14" fill="#33b679"/>
+    <text x="360" y="70" font-size="17" font-weight="700" fill="#fff">✅ 脑内打草稿（慢系统）</text>
+    <text x="360" y="120" font-size="22" font-weight="700" fill="#1c7a4d">慢系统3秒</text>
+    <text x="360" y="158" font-size="15" fill="#21303a">· 结论→三点排好</text>
+    <text x="360" y="192" font-size="15" fill="#5b6b8c">· 不卡壳不翻车</text>
+    <text x="360" y="226" font-size="15" fill="#5b6b8c">· 话从脑子里排队出</text>
+    <text x="360" y="262" font-size="13" fill="#1f5e57">给慢系统出场的机会</text>
+  </g>
+</svg>`;
+
+const ILL_DRAFT = `<svg viewBox="0 0 680 290" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="默念三秒当草稿时间">
+  <rect x="0" y="0" width="680" height="290" rx="14" fill="#f2f8ff"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#1f5e57">第一招 · 默念三秒当“草稿时间”</text>
+  <g font-family="SimSun,serif" font-size="16">
+    <rect x="40" y="48" width="180" height="120" rx="12" fill="#fff" stroke="#ffd0b8"/>
+    <text x="60" y="84" fill="#ff7043" font-weight="700" font-size="20">一</text>
+    <text x="92" y="84" fill="#21303a" font-weight="700">他想说啥</text>
+    <text x="60" y="120" fill="#5b6b8c" font-size="14">先听懂对方</text>
+    <text x="60" y="146" fill="#5b6b8c" font-size="14">再决定接不接</text>
+    <rect x="250" y="48" width="180" height="120" rx="12" fill="#fff" stroke="#bcd9f6"/>
+    <text x="270" y="84" fill="#0288d1" font-weight="700" font-size="20">二</text>
+    <text x="302" y="84" fill="#21303a" font-weight="700">我的结论</text>
+    <text x="270" y="120" fill="#5b6b8c" font-size="14">先想好要说的</text>
+    <text x="270" y="146" fill="#5b6b8c" font-size="14">一句话重点</text>
+    <rect x="460" y="48" width="180" height="120" rx="12" fill="#fff" stroke="#c9ecd6"/>
+    <text x="480" y="84" fill="#33b679" font-weight="700" font-size="20">三</text>
+    <text x="512" y="84" fill="#21303a" font-weight="700">三点理由</text>
+    <text x="480" y="120" fill="#5b6b8c" font-size="14">怎么证明它</text>
+    <text x="480" y="146" fill="#5b6b8c" font-size="14">最多列三条</text>
+    <text x="340" y="210" text-anchor="middle" font-size="17" fill="#1f5e57" font-weight="700">👅 舌尖抵上颚　✋ 手放桌上</text>
+    <text x="340" y="250" text-anchor="middle" font-size="14" fill="#5b6b8c">这三秒够从“快系统”切到“慢系统”，脑子里的草稿一排，嘴就不慌。</text>
+  </g>
+</svg>`;
+
+const ILL_CONCLUDE = `<svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="结论先行：先给结论再补理由">
+  <rect x="0" y="0" width="680" height="300" rx="14" fill="#fff8ec"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#a9650a">第二招 · 结论先行（先给结论，再补理由）</text>
+  <g font-family="SimSun,serif" font-size="15">
+    <rect x="24" y="46" width="312" height="226" rx="14" fill="#fff" stroke="#ffd0b8"/>
+    <rect x="24" y="46" width="312" height="32" rx="14" fill="#ef5350"/><rect x="24" y="66" width="312" height="14" fill="#ef5350"/>
+    <text x="40" y="70" font-size="16" font-weight="700" fill="#fff">💢 绕圈子（没重点）</text>
+    <text x="40" y="116" fill="#21303a">“哎呀我本来想看</text>
+    <text x="40" y="140" fill="#21303a">电影，后来小王说</text>
+    <text x="40" y="164" fill="#21303a">爬山，然后我妈说……”</text>
+    <text x="40" y="262" fill="#a9650a" font-size="13">对方听半天不知你要啥</text>
+    <rect x="344" y="46" width="312" height="226" rx="14" fill="#fff" stroke="#c9ecd6"/>
+    <rect x="344" y="46" width="312" height="32" rx="14" fill="#33b679"/><rect x="344" y="66" width="312" height="14" fill="#33b679"/>
+    <text x="360" y="70" font-size="16" font-weight="700" fill="#fff">✅ 结论 + 三点</text>
+    <text x="360" y="116" fill="#1c7a4d" font-weight="700">“周末我打算去爬山”</text>
+    <text x="360" y="150" fill="#21303a">因为：①天气好</text>
+    <text x="360" y="178" fill="#21303a">②小王也去 ③能锻炼</text>
+    <text x="360" y="262" fill="#1f5e57" font-size="13">先给结论，对方不慌，显条理</text>
+  </g>
+</svg>`;
+
+const ILL_THREE = `<svg viewBox="0 0 680 290" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="三点支撑：结论后面跟三条理由">
+  <rect x="0" y="0" width="680" height="290" rx="14" fill="#f2f8ff"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#1f5e57">第三招 · 三点支撑（黄金数：好记·显逻辑·不啰嗦）</text>
+  <g font-family="SimSun,serif" font-size="16">
+    <rect x="200" y="46" width="280" height="54" rx="14" fill="#1f5e57"/>
+    <text x="340" y="80" text-anchor="middle" fill="#fff" font-weight="700" font-size="19">结论（一句话重点）</text>
+    <text x="340" y="138" text-anchor="middle" font-size="30" fill="#5b6b8c">↓</text>
+    <rect x="40" y="150" width="180" height="96" rx="12" fill="#fff" stroke="#ffd0b8"/>
+    <text x="130" y="186" text-anchor="middle" fill="#ff7043" font-weight="700" font-size="18">① 理由一</text>
+    <text x="130" y="216" text-anchor="middle" fill="#5b6b8c" font-size="14">具体、可证</text>
+    <rect x="250" y="150" width="180" height="96" rx="12" fill="#fff" stroke="#bcd9f6"/>
+    <text x="340" y="186" text-anchor="middle" fill="#0288d1" font-weight="700" font-size="18">② 理由二</text>
+    <text x="340" y="216" text-anchor="middle" fill="#5b6b8c" font-size="14">别凑数</text>
+    <rect x="460" y="150" width="180" height="96" rx="12" fill="#fff" stroke="#c9ecd6"/>
+    <text x="550" y="186" text-anchor="middle" fill="#33b679" font-weight="700" font-size="18">③ 理由三</text>
+    <text x="550" y="216" text-anchor="middle" fill="#5b6b8c" font-size="14">多则乱·少则空</text>
+    <text x="340" y="272" text-anchor="middle" font-size="14" fill="#5b6b8c">多则乱、少则空；实在想不出三点，就说两点，别硬凑。</text>
+  </g>
+</svg>`;
+
+const ILL_BUF = `<svg viewBox="0 0 680 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="万能缓冲句三类（争草稿时间）">
+  <rect x="0" y="0" width="680" height="280" rx="14" fill="#f2f8ff"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#1f5e57">第四招 · 万能缓冲句（临场空白，争草稿时间）</text>
+  <g font-family="SimSun,serif" font-size="15">
+    <rect x="24" y="48" width="200" height="200" rx="12" fill="#fff" stroke="#ffd0b8"/>
+    <rect x="24" y="48" width="200" height="32" rx="12" fill="#ff7043"/><rect x="24" y="64" width="200" height="16" fill="#ff7043"/>
+    <text x="38" y="70" font-size="16" font-weight="700" fill="#fff">① 被突然点名</text>
+    <text x="38" y="116" fill="#21303a">“我整理下思路，</text>
+    <text x="38" y="140" fill="#21303a">待会细说。”</text>
+    <text x="38" y="208" font-size="13" fill="#5b6b8c">→ 你教我的高频句</text>
+    <rect x="240" y="48" width="200" height="200" rx="12" fill="#fff" stroke="#bcd9f6"/>
+    <rect x="240" y="48" width="200" height="32" rx="12" fill="#0288d1"/><rect x="240" y="64" width="200" height="16" fill="#0288d1"/>
+    <text x="254" y="70" font-size="16" font-weight="700" fill="#fff">② 接不上茬</text>
+    <text x="254" y="116" fill="#21303a">“这个角度我还真</text>
+    <text x="254" y="140" fill="#21303a">没想过，你接着说。”</text>
+    <text x="254" y="208" font-size="13" fill="#5b6b8c">→ 把球还回去</text>
+    <rect x="456" y="48" width="200" height="200" rx="12" fill="#fff" stroke="#c9ecd6"/>
+    <rect x="456" y="48" width="200" height="32" rx="12" fill="#33b679"/><rect x="456" y="64" width="200" height="16" fill="#33b679"/>
+    <text x="470" y="70" font-size="16" font-weight="700" fill="#fff">③ 怕说错</text>
+    <text x="470" y="116" fill="#21303a">“我先想想，</text>
+    <text x="470" y="140" fill="#21303a">等下接你的。”</text>
+    <text x="470" y="208" font-size="13" fill="#5b6b8c">→ 不是怂，是腾时间</text>
+  </g>
+</svg>`;
+
+const ILL_NOSAY = `<svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="话别说满：绝对肯定必须换成可能通常也许">
+  <rect x="0" y="0" width="680" height="300" rx="14" fill="#fff8ec"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#a9650a">第五招 · 话别说满（草稿里就把词换掉，留改口后路）</text>
+  <g font-family="SimSun,serif" font-size="16">
+    <rect x="24" y="46" width="312" height="226" rx="14" fill="#fff" stroke="#ffd0b8"/>
+    <rect x="24" y="46" width="312" height="32" rx="14" fill="#ef5350"/><rect x="24" y="66" width="312" height="14" fill="#ef5350"/>
+    <text x="40" y="70" font-size="16" font-weight="700" fill="#fff">💥 踩雷（说死）</text>
+    <text x="120" y="140" text-anchor="middle" font-size="26" font-weight="700" fill="#b3261e">绝对·肯定·必须</text>
+    <text x="40" y="200" fill="#5b6b8c">把猜说成定论，</text>
+    <text x="40" y="226" fill="#5b6b8c">出口就打脸、没后路。</text>
+    <text x="40" y="262" fill="#a9650a" font-size="13">口诀：说死＝留不住脸</text>
+    <rect x="344" y="46" width="312" height="226" rx="14" fill="#fff" stroke="#c9ecd6"/>
+    <rect x="344" y="46" width="312" height="32" rx="14" fill="#33b679"/><rect x="344" y="66" width="312" height="14" fill="#33b679"/>
+    <text x="360" y="70" font-size="16" font-weight="700" fill="#fff">✅ 不踩雷（留余地）</text>
+    <text x="500" y="140" text-anchor="middle" font-size="26" font-weight="700" fill="#1c7a4d">可能·通常·也许</text>
+    <text x="360" y="200" fill="#5b6b8c">把肯定说成可能，</text>
+    <text x="360" y="226" fill="#5b6b8c">把必须说成通常。</text>
+    <text x="360" y="262" fill="#1f5e57" font-size="13">口诀：留余地＝留体面</text>
+  </g>
+</svg>`;
+
+const ILL_CARD = `<svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="场景预设填空卡·打草稿">
+  <rect x="0" y="0" width="680" height="300" rx="14" fill="#fff8ec"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#a9650a">第六招 · 场景预设填空卡（提前打草稿，遇事掏卡）</text>
+  <g font-family="SimSun,serif" font-size="16">
+    <rect x="40" y="48" width="600" height="50" rx="12" fill="#fff" stroke="#ffd28a"/>
+    <text x="60" y="72" fill="#a9650a" font-weight="700">场景</text><text x="120" y="72" fill="#21303a">被突然点名发言</text>
+    <text x="360" y="72" fill="#a9650a" font-weight="700">→ 回应</text><text x="440" y="72" fill="#1f5e57" font-weight="700">“我整理下思路，待会细说”</text>
+    <rect x="40" y="106" width="600" height="50" rx="12" fill="#fff" stroke="#ffd28a"/>
+    <text x="60" y="130" fill="#a9650a" font-weight="700">场景</text><text x="120" y="130" fill="#21303a">被人问意见</text>
+    <text x="360" y="130" fill="#a9650a" font-weight="700">→ 回应</text><text x="440" y="130" fill="#1f5e57" font-weight="700">“我初步感觉，主要有两点”</text>
+    <rect x="40" y="164" width="600" height="50" rx="12" fill="#fff" stroke="#ffd28a"/>
+    <text x="60" y="188" fill="#a9650a" font-weight="700">场景</text><text x="120" y="188" fill="#21303a">被人反驳</text>
+    <text x="360" y="188" fill="#a9650a" font-weight="700">→ 回应</text><text x="440" y="188" fill="#1f5e57" font-weight="700">“你这角度有意思，我再想想”</text>
+    <rect x="40" y="222" width="600" height="50" rx="12" fill="#fff" stroke="#ffd28a"/>
+    <text x="60" y="246" fill="#a9650a" font-weight="700">场景</text><text x="120" y="246" fill="#21303a">冷场要救</text>
+    <text x="360" y="246" fill="#a9650a" font-weight="700">→ 回应</text><text x="440" y="246" fill="#1f5e57" font-weight="700">“你刚说的那个，我挺好奇”</text>
+    <text x="40" y="292" font-size="13" fill="#5b6b8c">挑“常·怕·卡”三类场面各写一句，存手机备忘录，遇事不抓瞎。</text>
+  </g>
+</svg>`;
+
+const ILL_ROLE = `<svg viewBox="0 0 680 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="角色扮演三层练·打草稿再答">
+  <rect x="0" y="0" width="680" height="230" rx="14" fill="#f2f8ff"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#1f5e57">第七招 · 角色扮演三层练（先打草稿，再出口）</text>
+  <g font-family="SimSun,serif" font-size="15" text-anchor="middle">
+    <rect x="24" y="56" width="180" height="100" rx="12" fill="#fff" stroke="#ffd0b8"/><text x="114" y="94" fill="#ff7043" font-weight="700" font-size="17">① 接住</text><text x="114" y="120" fill="#5b6b8c">看着他</text><text x="114" y="140" fill="#5b6b8c">点点头</text>
+    <text x="224" y="110" fill="#1f5e57" font-size="22" font-weight="700">➜</text>
+    <rect x="250" y="56" width="180" height="100" rx="12" fill="#fff" stroke="#bcd9f6"/><text x="340" y="94" fill="#0288d1" font-weight="700" font-size="17">② 打草稿</text><text x="340" y="120" fill="#5b6b8c">默念三秒</text><text x="340" y="140" fill="#5b6b8c">结论+三点</text>
+    <text x="450" y="110" fill="#1f5e57" font-size="22" font-weight="700">➜</text>
+    <rect x="476" y="56" width="180" height="100" rx="12" fill="#fff" stroke="#c9ecd6"/><text x="566" y="94" fill="#33b679" font-weight="700" font-size="17">③ 出口</text><text x="566" y="120" fill="#5b6b8c">结论+三点</text><text x="566" y="140" fill="#5b6b8c">清晰说不慌</text>
+    <text x="340" y="200" font-size="13" fill="#5b6b8c">练法：朋友突然点名/问意见/反驳，你练先默念三秒打草稿再答。没人陪？旧聊天改写三版——脱口版·打草稿版·清楚版，对比哪版最不冒失。</text>
+  </g>
+</svg>`;
+
+const ILL_HEROBOOK = `<svg viewBox="0 0 680 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="找榜样+向书学：偷师怎么讲清楚">
+  <rect x="0" y="0" width="680" height="280" rx="14" fill="#f2f8ff"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#1f5e57">第八招 · 找榜样 + 向书学（偷师怎么讲清楚）</text>
+  <g font-family="SimSun,serif" font-size="16">
+    <rect x="32" y="48" width="616" height="58" rx="12" fill="#fff" stroke="#ffd0b8"/>
+    <text x="50" y="76" fill="#ff7043" font-weight="700">🎤 榜样</text>
+    <text x="150" y="76" fill="#21303a">罗振宇开场永远“今天聊三个事”；何炅接话先接结论再补；董卿访谈用“等”留白。</text>
+    <text x="50" y="100" font-size="13" fill="#5b6b8c">照着学：开口先抛结论，再补支撑；别人停顿时点头等。</text>
+    <rect x="32" y="120" width="616" height="58" rx="12" fill="#fff" stroke="#c9ecd6"/>
+    <text x="50" y="148" fill="#33b679" font-weight="700">📚 向书学</text>
+    <text x="150" y="148" fill="#1f5e57" font-weight="700">巴巴拉·明托《金字塔原理》：结论先行、以上统下（1973，麦肯锡方法）。</text>
+    <text x="50" y="172" font-size="13" fill="#5b6b8c">脱不花《沟通的方法》：把“先说目标、再给方案”当基本功。</text>
+    <rect x="32" y="192" width="616" height="58" rx="12" fill="#fff" stroke="#bcd9f6"/>
+    <text x="50" y="220" fill="#0288d1" font-weight="700">✨ 效果</text>
+    <text x="150" y="220" fill="#21303a">看别人怎么组织语言，等于你先替自己试一遍；没榜样，书里到处是教材。</text>
+    <text x="50" y="244" font-size="13" fill="#5b6b8c">“奇妙的数字7”：人脑短期记忆容不下7个以上，所以讲三点最稳。</text>
+  </g>
+</svg>`;
+
+const ILL_MIRROR = `<svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="三问自查镜：草稿出口前最后过滤">
+  <rect x="0" y="0" width="680" height="300" rx="14" fill="#f2f8ff"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#1f5e57">第九招 · 三问自查镜（草稿出口前，最后照一遍）</text>
+  <ellipse cx="210" cy="165" rx="120" ry="105" fill="#eaf6f2" stroke="#1f5e57" stroke-width="6"/>
+  <ellipse cx="210" cy="165" rx="92" ry="80" fill="#fff" stroke="#bcd9f6"/>
+  <text x="210" y="150" text-anchor="middle" font-family="SimSun,serif" font-size="34" fill="#1f5e57" font-weight="700">?</text>
+  <text x="210" y="190" text-anchor="middle" font-family="SimSun,serif" font-size="22" fill="#33b679" font-weight="700">照镜</text>
+  <g font-family="SimSun,serif" font-size="17">
+    <rect x="370" y="56" width="280" height="60" rx="12" fill="#fff" stroke="#c9ecd6"/>
+    <text x="390" y="84" fill="#33b679" font-weight="700">① 该说吗？</text><text x="500" y="84" fill="#5b6b8c" font-size="14">现在该说？还是想显？</text>
+    <rect x="370" y="128" width="280" height="60" rx="12" fill="#fff" stroke="#c9ecd6"/>
+    <text x="390" y="156" fill="#33b679" font-weight="700">② 负责吗？</text><text x="500" y="156" fill="#5b6b8c" font-size="14">说完对方接得住吗？</text>
+    <rect x="370" y="200" width="280" height="60" rx="12" fill="#fff" stroke="#c9ecd6"/>
+    <text x="390" y="228" fill="#33b679" font-weight="700">③ 能收吗？</text><text x="500" y="228" fill="#5b6b8c" font-size="14">说错，圆得回来吗？</text>
+  </g>
+  <text x="340" y="288" text-anchor="middle" font-size="13" fill="#5b6b8c">三问过一遍，配合手放桌上、舌尖抵上颚，脑子里的草稿才放行出口。</text>
+</svg>`;
+
+/* ===== 课程步骤（sub=字幕；id=音频文件名；svg=案例图） ===== */
+const STEPS = [
+  {id:"t01",sp:"teacher",sub:"同学们好，我是晓晓老师。昨天第11关我们练了管住抢话的嘴——别人没说完别抢、别插、别碎碎念。今天第12关，换个更根本的毛病：你不是不会说，是一股脑儿往外倒，话到嘴边没在脑子里排过就冲出去了。今天教一招，叫脑内打草稿——开口前，先在心里把话排好，再出口。像写作文先列提纲，说话也一样。"},
+  {id:"t02",sp:"student",sub:"老师，我冤枉！我有时候是真没想就说了，说完才后悔，话都出口了收不回来！"},
+  {id:"t03",sp:"teacher",sub:"小明你这后悔太真实了。今天总口诀：开口之前打草稿，脑内排好再出口。默念三秒攒思路，结论先行不乱铺。三点支撑理清楚，三问过滤别冒出。话别说满留退路，缓冲一句我理理。场景预设先写好，角色扮演练条理。找榜样学清晰话，向书学里取妙语。想好再说慢半拍，清楚比快更体面。"},
+  {id:"t04",sp:"teacher",sub:"先懂为什么需要打草稿。脱口而出的话，像没装袋就出门——容易漏、容易乱、还容易说满。心理学有个快思考慢思考：人一激动，大脑走快系统，话比脑子先冲出来，结果常是三种：说一半卡壳、把可能说成肯定、接错茬跑题。打草稿，就是给慢系统三秒出场的机会，让话从脑子里排着队出来。",svg:ILL_WHY},
+  {id:"t05",sp:"student",sub:"老师，那这三秒我脑子空空，怎么排啊？"},
+  {id:"t06",sp:"teacher",sub:"第一招，把每天默念的三秒，升级成草稿时间。还是舌尖抵上颚、手放桌上，心里默念：一，他想说啥；二，我要说啥，先想结论；三，我怎么证明，想三点。这三秒够了，不用长，够你从快系统切到慢系统。脑子里的草稿一排，嘴就不慌了。",svg:ILL_DRAFT},
+  {id:"t07",sp:"teacher",sub:"第二招，结论先行。打草稿第一笔，先把结论写在脑门上。别人问周末去哪，冒失鬼：哎呀我本来想看电影后来小王说爬山然后我妈说——绕半天。清楚的人：周末我打算去爬山，因为天气好、小王也去、还能锻炼。先给结论，对方不慌，你也显条理。",svg:ILL_CONCLUDE},
+  {id:"t08",sp:"student",sub:"老师，那结论后面理由怎么排，才不会又啰嗦又乱？"},
+  {id:"t09",sp:"teacher",sub:"第三招，三点支撑。结论后面，最多跟三条理由，多则乱、少则空。三点是黄金数：好记、显逻辑、不啰嗦。实在想不出三点，就说两点，别硬凑；一点都说不出，就用第四招的缓冲句争时间。记住：说三点，不说过山车。",svg:ILL_THREE},
+  {id:"t10",sp:"student",sub:"老师，临场脑子一片空白，突然被点名，咋办？"},
+  {id:"t11",sp:"teacher",sub:"第四招，万能缓冲句，争取打草稿的时间。三类：被突然点名发言，说我整理下思路，待会细说；接不上茬，说这个角度我还真没想过，你接着说；怕说错，说我先想想，等下接你的。缓冲句不是怂，是给脑子腾出打草稿的时间。你教我的待会细说，关键时刻最管用。",svg:ILL_BUF},
+  {id:"t12",sp:"teacher",sub:"第五招，话别说满。打草稿时，就把绝对、肯定、必须圈掉，换成可能、通常、也许。草稿写我觉得可能选C，出口才不会打脸。留余地，就是留改口的后路，也是留体面。口诀：把肯定说成可能，把必须说成通常。",svg:ILL_NOSAY},
+  {id:"t13",sp:"teacher",sub:"第六招，场景预设。把常聊的话题提前打草稿存备忘录：被突然点名，回应我整理下思路，待会细说；被人问意见，回应我初步感觉，主要有两点；被人反驳，回应你这角度有意思，我再想想；冷场要救，回应你刚说的那个，我挺好奇。提前写好，遇事掏卡照念，不抓瞎。",svg:ILL_CARD},
+  {id:"t14",sp:"student",sub:"老师，我身边没人陪我练打草稿，书里也未必有。"},
+  {id:"t15",sp:"teacher",sub:"第七招，角色扮演。找朋友模拟：他突然点你名、突然问你意见、突然反驳，你练先默念三秒打草稿再答。三层：接住，点头；打草稿，默念三秒；出口，结论加三点。没人陪？拿段聊天记录改写三版——脱口版、打草稿版、清楚版，对比哪版最不冒失。练熟了，真场面就不慌。",svg:ILL_ROLE},
+  {id:"t16",sp:"teacher",sub:"第八招，找榜样加向书学。没榜样，看名人怎么讲清楚：罗振宇开场永远今天聊三个事；何炅接话先接结论再补；董卿访谈用等留白。书里也有：巴巴拉明托《金字塔原理》核心就一句，结论先行、以上统下；脱不花《沟通的方法》把先说目标再给方案当成基本功。看别人怎么组织语言，等于你先替自己试一遍。",svg:ILL_HEROBOOK},
+  {id:"t17",sp:"teacher",sub:"第九招，三问自查镜。草稿出口前最后照一遍：该说吗，这句现在该说，还是想显；负责吗，说完对方接得住吗；能收吗，说错圆得回来吗。三问过一遍，脑子里的草稿才放行出口。配合手放桌上、舌尖抵上颚，嘴就更慢、更稳。",svg:ILL_MIRROR},
+  {id:"t18",sp:"teacher",sub:"再送你一个睡前小妙招：数今天哪句没打草稿就冲出去了。睡前五分钟，回想今天——我哪句脱口了、最该排没排？重来我会怎么排。把冒失变草稿，攒成经验。口诀：睡前五分钟，数数脱口功。"},
+
+  {id:"t19",sp:"teacher",sub:"好，晓晓老师抽查第一题：别人问你周末去哪，最清楚的是？A，哎呀我本来想看电影后来小王说爬山然后我妈说；B，周末我打算去爬山，因为天气好、小王也去、还能锻炼；C，随便吧都行。想好了再选哦。",type:"quiz",
+    q:"别人问你“周末去哪”，最清楚的回答是？",
+    opts:["“哎呀我本来想看电影后来小王说爬山然后我妈说……”","“周末我打算去爬山，因为天气好、小王也去、还能锻炼”","“随便吧，都行”"],
+    ans:1, exp:"B 结论先行+三点支撑，清楚有条理；A 绕圈子没重点，C 太敷衍。先给结论再补三点，是脑内打草稿的招牌动作。"},
+  {id:"t20",sp:"teacher",sub:"第二题：突然被点名发言，你脑子空白，最稳的是？A，硬着头皮瞎说一通；B，我整理下思路，待会细说；C，我不知道啊别问我。想好了再选。",type:"quiz",
+    q:"突然被点名发言，脑子空白，最稳的是？",
+    opts:["硬着头皮瞎说一通","“我整理下思路，待会细说”","“我不知道啊，别问我”"],
+    ans:1, exp:"B 用缓冲句争取打草稿时间，不冒失也不怂；A 没草稿瞎说易翻车，C 直接拒接显慌。"},
+
+  {id:"t21",sp:"teacher",sub:"应用题来啦，小明。假设同学突然问你，你觉得咱们班春游去哪好，请用今天学的结论先行加三点支撑，写一句你会怎么打草稿再出口。写下来或者大声说出来都可以。",type:"feynman",
+    q:"应用题：同学突然问“咱们班春游去哪好”，请用「结论先行 + 三点支撑 + 缓冲句」打草稿，写一句你会怎么回答（清楚、不冒失）。",
+    ref:"参考：先缓冲——「我整理下思路，待会细说」；再出口——「我觉得去植物园挺好」（结论），因为离得近、票便宜、还能看樱花（三点）。把绝对换成可能，留改口后路。先想三秒，比脱口而出稳。"},
+  {id:"t22",sp:"teacher",sub:"最后是费曼复述挑战：假装你是老师，用自己的话讲一遍——为什么脱口而出容易翻车，用快思考慢思考？怎么用默念三秒当草稿时间、结论先行、三点支撑、万能缓冲句、三问自查，把话在脑子里排好再出口？讲不明白就是没真懂，多讲两遍就通了。",type:"feynman",
+    q:"费曼复述：用你自己的话，讲一遍——为什么脱口而出容易翻车（快思考/慢思考）？怎么用默念三秒当草稿时间、结论先行、三点支撑、万能缓冲句、三问自查，把话在脑子里排好再出口？写下来或说给家人听。",
+    ref:"参考：人一激动走快系统，话比脑子先冲出来，常卡壳、说满、接错茬。所以开口前舌尖抵上颚、手放桌上默念三秒当草稿时间：一想他要啥、二想我的结论、三想三点理由；先抛结论再补三点；临场空白用缓冲句（我整理下思路，待会细说 / 这个角度我还真没想过，你接着说）争时间；草稿出口前照三问（该说吗/负责吗/能收吗）。想好再说，清楚比快更体面。"},
+
+  {id:"t23",sp:"student",sub:"老师我懂了！以后开口前舌尖抵上颚手放桌上默念三秒打草稿，先抛结论再补三点，临场空白就说我整理下思路待会细说，把绝对换成可能，出口前还照三问！"},
+  {id:"t24",sp:"teacher",sub:"太棒了小明！记住：想好再说，慢半拍，清楚比快更体面。一句话没打草稿就冲，像菜没切就下锅——夹生还难看。今天第12关过了，明天见下一关！"},
+];
+
+/* ===== 不定时随机抽查题库（自动连播时会在某一句后突然弹出） ===== */
+const BONUS_POOL = [
+  {q:"（突击）突然被点名，你脑子空白，最稳？",opts:["硬着头皮瞎说","我整理下思路，待会细说","假装没听见"],ans:1,
+   exp:"B 用缓冲句争打草稿时间，不冒失也不怂；A 没草稿易翻车，C 躲不过去。"},
+  {q:"（突击）别人问你意见，怕说乱，最好？",opts:["想到哪说到哪","我初步感觉，主要有两点","你决定就好"],ans:1,
+   exp:"B 结论先行+两点支撑，清楚不啰嗦；A 易跑题，C 太敷衍。"},
+  {q:"（突击）话到嘴边想脱口，最好先？",opts:["直接冲出去","默念三秒打草稿","赶紧抢别人话"],ans:1,
+   exp:"B 舌尖抵上颚、手放桌上默念三秒，先把话在脑子里排好；A 冒失，C 抢话。"},
+];
+const NARR_IDX = STEPS.map((s,i)=>i).filter(i=>!STEPS[i].type);
+const bonusPos = NARR_IDX[Math.floor(Math.random()*(NARR_IDX.length-6))+3];
+const bonusQ = BONUS_POOL[Math.floor(Math.random()*BONUS_POOL.length)];
+
+/* ===== 元素 ===== */
+const stage=document.getElementById('stage'), capTxt=document.getElementById('capTxt'), capWho=document.getElementById('capWho');
+const bar=document.getElementById('bar'), pct=document.getElementById('pct'), scoreEl=document.getElementById('score');
+const playBtn=document.getElementById('playBtn'), prevBtn=document.getElementById('prevBtn'), nextBtn=document.getElementById('nextBtn');
+const autoChk=document.getElementById('autoChk'), capChk=document.getElementById('capChk'), rateSel=document.getElementById('rateSel');
+const seek=document.getElementById('seek'), curTime=document.getElementById('curTime'), durTime=document.getElementById('durTime');
+const back5=document.getElementById('back5'), fwd5=document.getElementById('fwd5');
+
+let cur=-1, score=0, audio=new Audio(), playing=false, autoTimer=null, bonusUsed=false, seeking=false;
+
+function fmt(t){ if(!isFinite(t)||t<0)t=0; const m=Math.floor(t/60), s=Math.floor(t%60); return m+':'+(s<10?'0':'')+s; }
+function setLessonProg(){ const p=Math.round((cur+1)/STEPS.length*100); bar.style.width=p+'%'; pct.textContent=p+'%'; }
+function setCap(sp,txt){ if(!capChk.checked){capTxt.textContent='（字幕已关闭）';capWho.textContent='字幕';return;} capWho.textContent=sp==='teacher'?'晓晓老师':'小明同学'; capTxt.textContent=txt; }
+function clearStage(){ stage.innerHTML=''; document.getElementById('stageHint')?.remove(); }
+function paintSeek(){ const v=(+seek.value)/1000*100; seek.style.background=`linear-gradient(90deg,#2e9e8a ${v}%, #e6ecf5 ${v}%)`; }
+
+function renderStep(i,isBonus=false){
+  clearStage();
+  if(isBonus){ renderQuiz(bonusQ,()=>advance(),true); setCap('teacher','（不定时抽查）'+bonusQ.q); return; }
+  const s=STEPS[i];
+  const row=document.createElement('div'); row.className='row '+(s.sp==='student'?'student':'');
+  const av=document.createElement('div'); av.className='avatar '+(s.sp==='student'?'student':'teacher'); av.textContent=s.sp==='student'?'明':'晓';
+  const col=document.createElement('div');
+  const name=document.createElement('div'); name.className='name'; name.textContent=s.sp==='student'?'小明同学':'晓晓老师';
+  const bub=document.createElement('div'); bub.className='bubble'; bub.textContent=s.sub;
+  col.appendChild(name); col.appendChild(bub); row.appendChild(av); row.appendChild(col); stage.appendChild(row);
+  if(s.svg){
+    const illu=document.createElement('div'); illu.className='illu';
+    illu.innerHTML=s.svg;
+    stage.appendChild(illu);
+  }
+  setCap(s.sp,s.sub);
+  if(s.type==='quiz'){ renderQuiz(s,()=>afterNarration(i)); }
+  else if(s.type==='feynman'){ renderFeynman(s,()=>afterNarration(i)); }
+  setLessonProg();
+  prevBtn.disabled=(i<=0); nextBtn.disabled=(i>=STEPS.length-1);
+}
+function renderQuiz(q,onDone,isBonus){
+  const box=document.createElement('div'); box.className='quiz';
+  box.innerHTML='<h3>📝 '+(isBonus?'不定时突击抽查':'晓晓老师抽查')+'</h3>';
+  const h=document.createElement('div'); h.style.cssText='font-size:17px;line-height:1.8;margin-bottom:6px;font-family:var(--read-font)'; h.textContent=q.q; box.appendChild(h);
+  q.opts.forEach((o,idx)=>{
+    const b=document.createElement('button'); b.className='opt'; b.textContent=o;
+    b.onclick=()=>{
+      box.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+      if(idx===q.ans){ b.classList.add('correct'); addScore(10); } else { b.classList.add('wrong'); box.querySelectorAll('.opt')[q.ans].classList.add('correct'); }
+      const e=document.createElement('div'); e.className='explain show'; e.textContent='💡 '+q.exp; box.appendChild(e);
+      const nb=document.createElement('button'); nb.className='btn primary mini'; nb.textContent='继续 ▶'; nb.style.marginTop='10px'; nb.onclick=()=>onDone(); box.appendChild(nb);
+    };
+    box.appendChild(b);
+  });
+  stage.appendChild(box);
+}
+function renderFeynman(s,onDone){
+  const box=document.createElement('div'); box.className='feynman';
+  box.innerHTML='<h3>🎤 '+(s.q.indexOf('费曼')>=0?'费曼复述挑战':'应用挑战')+'</h3>';
+  const p=document.createElement('div'); p.style.cssText='font-size:17px;line-height:1.8;margin-bottom:8px;font-family:var(--read-font)'; p.textContent=s.q; box.appendChild(p);
+  const ta=document.createElement('textarea'); ta.placeholder='用自己的话写下来，或大声说出来后点下面的按钮…'; box.appendChild(ta);
+  const rb=document.createElement('button'); rb.className='btn mini'; rb.textContent='👀 看参考答案';
+  const ref=document.createElement('div'); ref.className='ref'; ref.textContent=s.ref; rb.onclick=()=>ref.classList.add('show');
+  const nb=document.createElement('button'); nb.className='btn primary mini'; nb.textContent='我已复述，继续 ▶'; nb.style.marginLeft='8px'; nb.onclick=()=>{ addScore(5); onDone(); };
+  const wrap=document.createElement('div'); wrap.style.marginTop='10px'; wrap.appendChild(rb); wrap.appendChild(nb); box.appendChild(wrap); box.appendChild(ref);
+  stage.appendChild(box);
+}
+function addScore(n){ score+=n; scoreEl.textContent=score; }
+
+/* ===== 音频引擎 ===== */
+function loadAndPlay(i){
+  playing=true; playBtn.textContent='⏸ 暂停';
+  audio.src='audio_d0723/'+STEPS[i].id+'.mp3';
+  audio.playbackRate=parseFloat(rateSel.value);
+  audio.play().catch(()=>{ playBtn.textContent='▶ 播放'; });
+}
+audio.addEventListener('loadedmetadata',()=>{ durTime.textContent=fmt(audio.duration); });
+audio.addEventListener('timeupdate',()=>{
+  if(seeking) return;
+  curTime.textContent=fmt(audio.currentTime);
+  if(audio.duration){ seek.value=Math.round(audio.currentTime/audio.duration*1000); paintSeek(); }
+});
+audio.addEventListener('ended',()=>{
+  playing=false; playBtn.textContent='▶ 重播这句';
+  const i=cur;
+  if(autoChk.checked && !STEPS[i].type){
+    if(!bonusUsed && i===bonusPos){ bonusUsed=true; setTimeout(()=>renderStep(i,true),400); return; }
+    autoTimer=setTimeout(()=>advance(),450);
+  }
+});
+/* 拖动进度条：随意调播放位置 */
+seek.addEventListener('input',()=>{ seeking=true; paintSeek(); if(audio.duration){ curTime.textContent=fmt((+seek.value)/1000*audio.duration); } });
+seek.addEventListener('change',()=>{ if(audio.duration){ audio.currentTime=(+seek.value)/1000*audio.duration; } seeking=false; });
+back5.onclick=()=>{ audio.currentTime=Math.max(0,audio.currentTime-5); };
+fwd5.onclick=()=>{ if(audio.duration) audio.currentTime=Math.min(audio.duration,audio.currentTime+5); };
+rateSel.onchange=()=>{ audio.playbackRate=parseFloat(rateSel.value); };
+
+function advance(){ if(cur>=STEPS.length-1){ finish(); return; }
+  cur++; renderStep(cur); loadAndPlay(cur); }
+function afterNarration(i){ if(autoChk.checked){ autoTimer=setTimeout(()=>advance(),400); } }
+function goStep(i){ cur=i; renderStep(cur); loadAndPlay(cur); }
+function resetSeek(){ audio.pause(); seek.value=0; paintSeek(); curTime.textContent='0:00'; durTime.textContent='0:00'; playing=false; playBtn.textContent='▶ 播放'; }
+
+function finish(){
+  clearStage(); resetSeek();
+  document.getElementById('endOverlay').classList.remove('hidden');
+  document.getElementById('endMsg').innerHTML='你练完了「开口前在脑子里打草稿——先把话排好再出口」这一关，本次得分 ⭐ <b>'+score+'</b>。真正学会的标志：<b>下次开口前，舌尖抵上颚、手放桌上默念三秒当草稿时间——一想他要啥、二想我的结论、三想三点理由；先抛结论再补三点；临场空白用缓冲句（如“我整理下思路，待会细说”“这个角度我还真没想过，你接着说”），把“绝对/肯定”换成“可能/通常”不把话说死；出口前照三问（该说吗/负责吗/能收吗）。</b>';
+  document.getElementById('endCards').innerHTML=`
+    <div class="kcard"><b>① 为什么打草稿</b><br>快系统脱口<br>慢系统3秒</div>
+    <div class="kcard"><b>② 默念3秒</b><br>舌尖抵上颚<br>手放桌上</div>
+    <div class="kcard"><b>③ 结论先行</b><br>先抛重点<br>再补理由</div>
+    <div class="kcard"><b>④ 三点支撑</b><br>多则乱<br>少则空</div>
+    <div class="kcard"><b>⑤ 万能缓冲句</b><br>我整理下思路<br>这角度真没想过</div>
+    <div class="kcard"><b>⑥ 话别说满</b><br>可能·通常·也许</div>
+    <div class="kcard"><b>⑦ 场景预设卡</b><br>被点名·被问<br>被反驳·冷场</div>
+    <div class="kcard"><b>⑧ 角色扮演</b><br>接住·打草稿<br>出口</div>
+    <div class="kcard"><b>⑨ 找榜样+向书学</b><br>明托金字塔<br>结论先行</div>
+    <div class="kcard"><b>⑩ 三问自查镜</b><br>该说吗·负责吗<br>能收吗·手放桌</div>`;
+  bar.style.width='100%'; pct.textContent='100%';
+}
+
+/* 控件 */
+playBtn.onclick=()=>{
+  if(cur<0){ advance(); return; }
+  if(playing){ audio.pause(); playing=false; playBtn.textContent='▶ 继续'; }
+  else { playing=true; playBtn.textContent='⏸ 暂停'; audio.play().catch(()=>{}); }
+};
+nextBtn.onclick=()=>{ if(cur<STEPS.length-1){ clearTimeout(autoTimer); advance(); } };
+prevBtn.onclick=()=>{ if(cur>0){ clearTimeout(autoTimer); goStep(cur-1); } };
+document.getElementById('startBtn').onclick=()=>{ document.getElementById('introOverlay').classList.add('hidden'); advance(); };
+document.getElementById('replayBtn').onclick=()=>{ document.getElementById('endOverlay').classList.add('hidden'); cur=-1; score=0; scoreEl.textContent=0; bonusUsed=false; advance(); };
+capChk.onchange=()=>{ if(cur>=0 && STEPS[cur]) setCap(STEPS[cur].sp,STEPS[cur].sub); };
+paintSeek();
+</script>
+</body>
+</html>
