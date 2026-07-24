@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日一练 · 求人帮忙不卑不亢：开口前把话说到对方心坎上 — 晓晓老师</title>
+<style>
+  :root{
+    --bg1:#eaf6f2; --bg2:#eef0fe; --board:#1f5e57;
+    --ink:#21303a; --soft:#5b6b8c; --good:#33b679; --bad:#ef5350; --gold:#ffb300;
+    --teacher:#ff7043; --student:#0288d1;
+    --read-font:"SimSun","宋体","Songti SC","STSong",serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+    background:linear-gradient(160deg,var(--bg1),var(--bg2));
+    color:var(--ink);display:flex;flex-direction:column;min-height:100vh;
+  }
+  header{
+    background:var(--board);color:#fff;padding:12px 18px;display:flex;
+    align-items:center;gap:14px;flex-wrap:wrap;box-shadow:0 4px 14px rgba(0,0,0,.18);
+    position:sticky;top:0;z-index:5;
+  }
+  header h1{font-size:18px;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
+  .badge{background:var(--gold);color:#5a4500;font-size:12px;padding:2px 9px;border-radius:20px;font-weight:700}
+  .lesson-prog{flex:1;min-width:150px;display:flex;align-items:center;gap:8px}
+  .lp-bar{flex:1;height:8px;background:#ffffff33;border-radius:20px;overflow:hidden}
+  .lp-bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7ee0c3,#2e9e8a);transition:width .4s}
+  .score{background:#ffffff22;padding:4px 10px;border-radius:20px;font-size:13px;white-space:nowrap}
+  main{flex:1;display:flex;flex-direction:column;padding:16px 16px 8px;max-width:920px;width:100%;margin:0 auto}
+  .stage{
+    flex:1;background:#fff;border-radius:18px;box-shadow:0 8px 26px rgba(60,80,120,.14);
+    padding:18px;display:flex;flex-direction:column;gap:14px;min-height:280px;position:relative;overflow:hidden;
+  }
+  .stage::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% -10%,#e6faf3,transparent 55%);pointer-events:none}
+  .row{display:flex;gap:12px;align-items:flex-end;z-index:1}
+  .row.student{flex-direction:row-reverse}
+  .avatar{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:22px;font-weight:800;color:#fff;flex:0 0 auto;box-shadow:0 4px 10px rgba(0,0,0,.15)}
+  .avatar.teacher{background:linear-gradient(135deg,#ffb74d,#ff7043)}
+  .avatar.student{background:linear-gradient(135deg,#4fc3f7,#0288d1)}
+  .bubble{max-width:78%;background:#f4f7fb;border:1px solid #e4ebf5;border-radius:16px;padding:14px 17px;
+    line-height:1.95;font-size:18px;font-family:var(--read-font);animation:pop .35s ease}
+  .row.student .bubble{background:#e3f2fd;border-color:#cfe8fb}
+  .name{font-size:13px;color:var(--soft);margin:0 4px 4px;font-weight:700}
+  @keyframes pop{from{transform:translateY(8px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+
+  /* 案例图：插图容器 */
+  .illu{margin:2px 0 4px;background:#fbfdff;border:1px dashed #cfe0ea;border-radius:14px;padding:10px;z-index:1;animation:pop .35s ease}
+  .illu svg{width:100%;height:auto;display:block;border-radius:10px}
+  .illu .illu-cap{font-size:13px;color:var(--soft);text-align:center;margin-top:6px;font-family:var(--read-font)}
+
+  /* 底部字幕：不遮挡上方讲解 */
+  .caption{margin:12px auto 0;max-width:920px;width:100%;padding:0 16px}
+  .caption-bar{background:rgba(31,48,58,.94);color:#fff;border-radius:14px;padding:13px 17px;font-size:17px;
+    line-height:1.8;font-family:var(--read-font);display:flex;align-items:center;gap:10px;min-height:56px;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+  .caption-bar .who{font-size:12px;background:#ffffff33;padding:2px 8px;border-radius:10px;white-space:nowrap;font-family:inherit}
+  .caption-bar .txt{flex:1}
+
+  /* 可拖动的播放进度条 */
+  .player{max-width:920px;width:100%;margin:10px auto 0;padding:0 16px}
+  .seek-wrap{display:flex;align-items:center;gap:10px;background:#fff;border-radius:14px;padding:10px 14px;
+    box-shadow:0 4px 12px rgba(60,80,120,.12)}
+  .time{font-size:12px;color:var(--soft);font-variant-numeric:tabular-nums;white-space:nowrap;min-width:38px;text-align:center}
+  input[type=range].seek{
+    -webkit-appearance:none;appearance:none;flex:1;height:8px;border-radius:20px;cursor:pointer;
+    background:linear-gradient(90deg,#2e9e8a 0%, #2e9e8a 0%, #e6ecf5 0%, #e6ecf5 100%);
+  }
+  input[type=range].seek::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+    background:#1f5e57;box-shadow:0 2px 6px rgba(0,0,0,.25);cursor:pointer;border:2px solid #fff}
+  input[type=range].seek::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#1f5e57;border:2px solid #fff;cursor:pointer}
+
+  .controls{display:flex;gap:10px;align-items:center;justify-content:center;padding:12px 8px 6px;flex-wrap:wrap}
+  button.btn{border:none;border-radius:24px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;
+    background:#fff;color:var(--ink);box-shadow:0 4px 12px rgba(60,80,120,.18);transition:transform .12s,background .2s}
+  button.btn:hover{transform:translateY(-2px)}
+  button.btn.primary{background:linear-gradient(135deg,#34b89c,#1f5e57);color:#fff}
+  button.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+  .toggle{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--soft)}
+  .rate{font-size:13px;color:var(--soft);display:flex;align-items:center;gap:4px}
+  select{border:1px solid #d7dff0;border-radius:10px;padding:4px 6px;font-size:13px;color:var(--ink);background:#fff}
+
+  .quiz,.feynman{background:#fffdf6;border:2px dashed var(--gold);border-radius:16px;padding:16px;margin-top:4px;z-index:1;animation:pop .35s ease}
+  .quiz h3,.feynman h3{font-size:16px;color:#a9650a;margin-bottom:10px;display:flex;gap:6px;align-items:center}
+  .opt{display:block;width:100%;text-align:left;background:#fff;border:2px solid #f0d9a8;color:var(--ink);
+    border-radius:12px;padding:11px 14px;margin:8px 0;font-size:17px;cursor:pointer;transition:.15s;font-family:var(--read-font)}
+  .opt:hover{border-color:var(--gold)}
+  .opt.correct{background:#e6f7ee;border-color:var(--good);color:#1c7a4d;font-weight:700}
+  .opt.wrong{background:#fdecea;border-color:var(--bad);color:#b3261e}
+  .opt:disabled{cursor:default}
+  .explain{margin-top:10px;font-size:15px;line-height:1.7;color:var(--soft);background:#f6f8fc;padding:10px 12px;border-radius:10px;display:none;font-family:var(--read-font)}
+  .explain.show{display:block}
+  textarea{width:100%;min-height:92px;border:2px solid #e2e8f2;border-radius:12px;padding:12px;font-size:17px;font-family:var(--read-font);resize:vertical;line-height:1.8}
+  textarea:focus{outline:none;border-color:var(--student)}
+  .ref{margin-top:10px;font-size:15px;line-height:1.9;color:var(--ink);background:#eef7ff;border-left:4px solid var(--student);padding:12px 14px;border-radius:0 10px 10px 0;display:none;font-family:var(--read-font)}
+  .ref.show{display:block}
+  .mini{font-size:13px;padding:8px 14px}
+  .hint{font-size:14px;color:var(--soft);text-align:center;margin-top:6px;font-family:var(--read-font)}
+
+  .overlay{position:fixed;inset:0;background:linear-gradient(160deg,#1f5e57,#143a36);color:#fff;z-index:30;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;gap:16px}
+  .overlay h2{font-size:24px}
+  .overlay p{max-width:560px;line-height:1.9;color:#d6efe8;font-family:var(--read-font);font-size:17px}
+  .overlay .big{font-size:54px;animation:float 3s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .hidden{display:none!important}
+  .card-grid{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+  .kcard{background:#ffffff14;border:1px solid #ffffff2e;border-radius:14px;padding:12px 16px;min-width:150px;text-align:left;font-family:var(--read-font)}
+  .kcard b{color:#7ee0c3}
+  footer{text-align:center;color:var(--soft);font-size:12px;padding:10px}
+  @media (max-width:560px){.bubble{max-width:86%}header h1{font-size:15px}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>💬 每日一练 · 求人帮忙不卑不亢：开口前把话说到对方心坎上 <span class="badge">第13关</span></h1>
+  <div class="lesson-prog">
+    <div class="lp-bar"><i id="bar"></i></div>
+    <span id="pct" style="font-size:13px">0%</span>
+  </div>
+  <div class="score">⭐ 得分 <span id="score">0</span></div>
+</header>
+
+<main>
+  <div class="stage" id="stage">
+    <div class="hint" id="stageHint">点击「开始上课」，听晓晓老师用神经网络语音一句句讲～</div>
+  </div>
+
+  <div class="caption">
+    <div class="caption-bar">
+      <span class="who" id="capWho">字幕</span>
+      <span class="txt" id="capTxt">准备好了吗？语音讲解会显示字幕在这里，不会挡住上面的画面。进度条可以随意拖动。</span>
+    </div>
+  </div>
+
+  <!-- 可拖动播放进度条 -->
+  <div class="player">
+    <div class="seek-wrap">
+      <span class="time" id="curTime">0:00</span>
+      <input type="range" class="seek" id="seek" min="0" max="1000" value="0" step="1" aria-label="播放进度，可拖动">
+      <span class="time" id="durTime">0:00</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prevBtn" disabled>⏮ 上一句</button>
+    <button class="btn" id="back5">⏪ 5秒</button>
+    <button class="btn primary" id="playBtn">▶ 开始上课</button>
+    <button class="btn" id="fwd5">5秒 ⏩</button>
+    <button class="btn" id="nextBtn" disabled>下一句 ⏭</button>
+  </div>
+  <div class="controls" style="padding-top:0">
+    <label class="toggle"><input type="checkbox" id="autoChk" checked> 自动连播</label>
+    <label class="toggle"><input type="checkbox" id="capChk" checked> 字幕</label>
+    <label class="rate">语速
+      <select id="rateSel">
+        <option value="0.75">0.75×</option>
+        <option value="0.9">0.9×</option>
+        <option value="1" selected>1.0×</option>
+        <option value="1.25">1.25×</option>
+        <option value="1.5">1.5×</option>
+      </select>
+    </label>
+  </div>
+</main>
+
+<footer>求人帮忙别慌张 · 先排草稿再开腔 · 欠人情换机会 · 把一定说成也许 · 晓晓老师陪你练</footer>
+
+<div class="overlay" id="introOverlay">
+  <div class="big">🤝</div>
+  <h2>今天练：求人帮忙不卑不亢——开口前把话说到对方心坎上</h2>
+  <p>第12关草稿法练了，今天治最让人手心出汗的场面：<b>找人帮忙</b>。晓晓老师用<b>神经网络语音</b>一句句讲：先用<b>富兰克林效应</b>解开"怕欠人情"的心结（帮过你忙的人更愿意再帮你）；再学<b>万能缓冲句铺台阶</b>（含"不耽误你吧""这个角度我还真没想过，你接着说"）；<b>话别说满</b>（一定→也许）；<b>场景预设卡</b>；<b>被拒不崩</b>；<b>角色扮演</b>练被拒；<b>找榜样+向书学</b>（富兰克林/卡耐基/阿伦森）；<b>三问自查镜（求人版）</b>。每讲一件配一张<b>案例图</b>，看着不枯燥。中途会<b>随时抽查</b>、带你<b>费曼复述</b>。进度条能随便拖，听不清就往回拉！</p>
+  <button class="btn primary" id="startBtn" style="font-size:17px;padding:14px 30px">🚀 开始上课</button>
+  <p style="font-size:13px;color:#9fd9cd">建议戴耳机；字幕在底部，不挡画面；宋体大字，看得清。</p>
+</div>
+
+<div class="overlay hidden" id="endOverlay">
+  <div class="big">🏆</div>
+  <h2>这一关，你过了！</h2>
+  <p id="endMsg"></p>
+  <div class="card-grid" id="endCards"></div>
+  <button class="btn primary" id="replayBtn" style="font-size:16px;padding:12px 26px">🔁 再练一遍</button>
+</div>
+
+<script>
+/* ===== 案例图（SVG 插图，初中生也能看懂） ===== */
+const ILL_OVERVIEW = `<svg viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="第13关速览：求人帮忙不卑不亢十件事">
+  <rect x="0" y="0" width="680" height="320" rx="14" fill="#f2f8ff"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#1f5e57">第13关速览 · 求人帮忙不卑不亢（十件事）</text>
+  <g font-family="SimSun,serif" font-size="13.5">
+    <rect x="20" y="46" width="152" height="58" rx="10" fill="#fff" stroke="#c9ecd6"/><text x="30" y="72" fill="#1f5e57" font-weight="700">① 原理·富兰克林效应</text><text x="30" y="93" fill="#5b6b8c">帮过你忙的人更愿帮你</text>
+    <rect x="180" y="46" width="152" height="58" rx="10" fill="#fff" stroke="#ffd0b8"/><text x="190" y="72" fill="#ff7043" font-weight="700">② 欠人情→给机会</text><text x="190" y="93" fill="#5b6b8c">求小忙·不碰钱</text>
+    <rect x="340" y="46" width="152" height="58" rx="10" fill="#fff" stroke="#bcd9f6"/><text x="350" y="72" fill="#0288d1" font-weight="700">③ 缓冲句铺台阶</text><text x="350" y="93" fill="#5b6b8c">不耽误你吧</text>
+    <rect x="500" y="46" width="160" height="58" rx="10" fill="#fff" stroke="#ffd28a"/><text x="510" y="72" fill="#a9650a" font-weight="700">④ 话别说满</text><text x="510" y="93" fill="#5b6b8c">一定→也许</text>
+    <rect x="20" y="114" width="152" height="58" rx="10" fill="#fff" stroke="#ffd28a"/><text x="30" y="140" fill="#a9650a" font-weight="700">⑤ 场景预设卡</text><text x="30" y="161" fill="#5b6b8c">借物·问作业·约时间</text>
+    <rect x="180" y="114" width="152" height="58" rx="10" fill="#fff" stroke="#ffd0b8"/><text x="190" y="140" fill="#ff7043" font-weight="700">⑥ 被拒不崩</text><text x="190" y="161" fill="#5b6b8c">接住·不追加</text>
+    <rect x="340" y="114" width="152" height="58" rx="10" fill="#fff" stroke="#bcd9f6"/><text x="350" y="140" fill="#0288d1" font-weight="700">⑦ 角色扮演</text><text x="350" y="161" fill="#5b6b8c">练被拒三层</text>
+    <rect x="500" y="114" width="160" height="58" rx="10" fill="#fff" stroke="#c9ecd6"/><text x="510" y="140" fill="#33b679" font-weight="700">⑧ 找榜样+向书学</text><text x="510" y="161" fill="#5b6b8c">富兰克林/卡耐基</text>
+    <rect x="180" y="182" width="320" height="58" rx="10" fill="#fff" stroke="#c9ecd6"/><text x="190" y="208" fill="#1f5e57" font-weight="700">⑨ 三问自查镜（求人版）</text><text x="190" y="229" fill="#5b6b8c">该求吗·方便吗·能回报吗</text>
+    <rect x="20" y="182" width="152" height="58" rx="10" fill="#fff" stroke="#ffd28a"/><text x="30" y="208" fill="#a9650a" font-weight="700">⑩ 睡前小妙招</text><text x="30" y="229" fill="#5b6b8c">数今天不敢求</text>
+    <rect x="20" y="252" width="640" height="48" rx="10" fill="#1f5e57"/><text x="340" y="282" text-anchor="middle" fill="#fff" font-weight="700" font-size="15">会求人不是怂，是给彼此一个靠近的机会——把"你一定帮"换成"不方便也没事"。</text>
+  </g>
+</svg>`;
+
+const ILL_WHY = `<svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="富兰克林效应：帮过你忙的人更愿意再帮你">
+  <rect x="0" y="0" width="680" height="300" rx="14" fill="#f2f8ff"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#1f5e57">原理 · 富兰克林效应（怕求人是个误会）</text>
+  <g font-family="SimSun,serif">
+    <rect x="24" y="46" width="312" height="226" rx="14" fill="#fff" stroke="#c9ecd6"/>
+    <rect x="24" y="46" width="312" height="34" rx="14" fill="#33b679"/><rect x="24" y="66" width="312" height="14" fill="#33b679"/>
+    <text x="40" y="70" font-size="17" font-weight="700" fill="#fff">✅ 帮过你忙的人</text>
+    <text x="40" y="120" font-size="22" font-weight="700" fill="#1c7a4d">更愿意再帮你</text>
+    <text x="40" y="158" font-size="15" fill="#21303a">· 1736 富兰克林借书</text>
+    <text x="40" y="192" font-size="15" fill="#5b6b8c">· 政敌→成朋友</text>
+    <text x="40" y="226" font-size="15" fill="#5b6b8c">· 卡耐基/阿伦森记载</text>
+    <text x="40" y="262" font-size="13" fill="#1f5e57">求助=给人家帮你的机会</text>
+    <rect x="344" y="46" width="312" height="226" rx="14" fill="#fff" stroke="#ffd0b8"/>
+    <rect x="344" y="46" width="312" height="34" rx="14" fill="#ef5350"/><rect x="344" y="66" width="312" height="14" fill="#ef5350"/>
+    <text x="360" y="70" font-size="17" font-weight="700" fill="#fff">💥 误会：怕欠人情</text>
+    <text x="360" y="120" font-size="22" font-weight="700" fill="#b3261e">越怕越推开</text>
+    <text x="360" y="158" font-size="15" fill="#21303a">· 硬扛不敢开口</text>
+    <text x="360" y="192" font-size="15" fill="#5b6b8c">· 关系反而远</text>
+    <text x="360" y="226" font-size="15" fill="#5b6b8c">· 2015研究：求助显亲和</text>
+    <text x="360" y="262" font-size="13" fill="#a9650a">帮了你，对方更喜欢你</text>
+  </g>
+</svg>`;
+
+const ILL_MINDSET = `<svg viewBox="0 0 680 290" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="欠人情换成给机会：求小忙不卑微">
+  <rect x="0" y="0" width="680" height="290" rx="14" fill="#fff8ec"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#a9650a">第一招 · 欠人情 → 给机会（求小忙不卑微）</text>
+  <g font-family="SimSun,serif" font-size="16">
+    <rect x="40" y="48" width="280" height="120" rx="12" fill="#fff" stroke="#ffd0b8"/>
+    <text x="58" y="84" fill="#ff7043" font-weight="700" font-size="18">✘ 大动作</text>
+    <text x="58" y="116" fill="#21303a">张口借钱、要人跑远路</text>
+    <text x="58" y="146" fill="#5b6b8c">像搬座山，谁都皱眉</text>
+    <rect x="360" y="48" width="280" height="120" rx="12" fill="#fff" stroke="#c9ecd6"/>
+    <text x="378" y="84" fill="#33b679" font-weight="700" font-size="18">✔ 小忙</text>
+    <text x="378" y="116" fill="#21303a">借支笔、问个作业</text>
+    <text x="378" y="146" fill="#5b6b8c">像递块糖，顺手就帮</text>
+    <text x="340" y="206" text-anchor="middle" font-size="17" fill="#1f5e57" font-weight="700">三原则：求小 · 不碰钱 · 事后必有还</text>
+    <text x="340" y="246" text-anchor="middle" font-size="14" fill="#5b6b8c">有借有还，再借不难；小忙显你懂事，对方帮得开心。</text>
+  </g>
+</svg>`;
+
+const ILL_BUF = `<svg viewBox="0 0 680 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="万能缓冲句三类铺台阶">
+  <rect x="0" y="0" width="680" height="280" rx="14" fill="#f2f8ff"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#1f5e57">第二招 · 万能缓冲句（先铺台阶再开口）</text>
+  <g font-family="SimSun,serif" font-size="15">
+    <rect x="24" y="48" width="200" height="200" rx="12" fill="#fff" stroke="#ffd0b8"/>
+    <rect x="24" y="48" width="200" height="32" rx="12" fill="#ff7043"/><rect x="24" y="64" width="200" height="16" fill="#ff7043"/>
+    <text x="38" y="70" font-size="16" font-weight="700" fill="#fff">① 不知忙不忙</text>
+    <text x="38" y="116" fill="#21303a">“不耽误你吧？</text>
+    <text x="38" y="140" fill="#21303a">方便的时候能不能…”</text>
+    <text x="38" y="208" font-size="13" fill="#5b6b8c">→ 先替对方想一步</text>
+    <rect x="240" y="48" width="200" height="200" rx="12" fill="#fff" stroke="#bcd9f6"/>
+    <rect x="240" y="48" width="200" height="32" rx="12" fill="#0288d1"/><rect x="240" y="64" width="200" height="16" fill="#0288d1"/>
+    <text x="254" y="70" font-size="16" font-weight="700" fill="#fff">② 接不上话</text>
+    <text x="254" y="116" fill="#21303a">“这个角度我还真</text>
+    <text x="254" y="140" fill="#21303a">没想过，你接着说。”</text>
+    <text x="254" y="208" font-size="13" fill="#5b6b8c">→ 把球还回去</text>
+    <rect x="456" y="48" width="200" height="200" rx="12" fill="#fff" stroke="#c9ecd6"/>
+    <rect x="456" y="48" width="200" height="32" rx="12" fill="#33b679"/><rect x="456" y="64" width="200" height="16" fill="#33b679"/>
+    <text x="470" y="70" font-size="16" font-weight="700" fill="#fff">③ 怕太突兀</text>
+    <text x="470" y="116" fill="#21303a">“有个小事想请教</text>
+    <text x="470" y="140" fill="#21303a">你，方不方便？”</text>
+    <text x="470" y="208" font-size="13" fill="#5b6b8c">→ 把“要”说成“请教”</text>
+  </g>
+</svg>`;
+
+const ILL_NOSAY = `<svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="话别说满·求人版：一定换成也许">
+  <rect x="0" y="0" width="680" height="300" rx="14" fill="#fff8ec"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#a9650a">第三招 · 话别说满（不替对方做决定）</text>
+  <g font-family="SimSun,serif" font-size="16">
+    <rect x="24" y="46" width="312" height="226" rx="14" fill="#fff" stroke="#ffd0b8"/>
+    <rect x="24" y="46" width="312" height="32" rx="14" fill="#ef5350"/><rect x="24" y="66" width="312" height="14" fill="#ef5350"/>
+    <text x="40" y="70" font-size="16" font-weight="700" fill="#fff">💥 替人拍板（施压）</text>
+    <text x="120" y="140" text-anchor="middle" font-size="22" font-weight="700" fill="#b3261e">你一定帮我</text>
+    <text x="40" y="200" fill="#5b6b8c">把人架火上烤，</text>
+    <text x="40" y="226" fill="#5b6b8c">对方压力大反而不想帮。</text>
+    <text x="40" y="262" fill="#a9650a" font-size="13">口诀：替人决定＝赶人走</text>
+    <rect x="344" y="46" width="312" height="226" rx="14" fill="#fff" stroke="#c9ecd6"/>
+    <rect x="344" y="46" width="312" height="32" rx="14" fill="#33b679"/><rect x="344" y="66" width="312" height="14" fill="#33b679"/>
+    <text x="360" y="70" font-size="16" font-weight="700" fill="#fff">✅ 留余地（体面）</text>
+    <text x="500" y="140" text-anchor="middle" font-size="22" font-weight="700" fill="#1c7a4d">也许·可能</text>
+    <text x="360" y="200" fill="#5b6b8c">“不方便也没事”，</text>
+    <text x="360" y="226" fill="#5b6b8c">对方帮得心甘情愿。</text>
+    <text x="360" y="262" fill="#1f5e57" font-size="13">口诀：把一定说成也许</text>
+  </g>
+</svg>`;
+
+const ILL_CARD = `<svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="场景预设填空卡·求人三类">
+  <rect x="0" y="0" width="680" height="300" rx="14" fill="#fff8ec"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#a9650a">第四招 · 场景预设填空卡（提前想好怎么开口）</text>
+  <g font-family="SimSun,serif" font-size="16">
+    <rect x="40" y="48" width="600" height="50" rx="12" fill="#fff" stroke="#ffd28a"/>
+    <text x="60" y="72" fill="#a9650a" font-weight="700">借东西</text><text x="150" y="72" fill="#21303a">我××落在教室了</text>
+    <text x="360" y="72" fill="#a9650a" font-weight="700">→</text><text x="400" y="72" fill="#1f5e57" font-weight="700">“不知方不方便借我拍一下？不方便也没事”</text>
+    <rect x="40" y="106" width="600" height="50" rx="12" fill="#fff" stroke="#ffd28a"/>
+    <text x="60" y="130" fill="#a9650a" font-weight="700">问作业</text><text x="150" y="130" fill="#21303a">这题没太懂</text>
+    <text x="360" y="130" fill="#a9650a" font-weight="700">→</text><text x="400" y="130" fill="#1f5e57" font-weight="700">“想请教你一下，不耽误你吧？”</text>
+    <rect x="40" y="164" width="600" height="50" rx="12" fill="#fff" stroke="#ffd28a"/>
+    <text x="60" y="188" fill="#a9650a" font-weight="700">约时间</text><text x="150" y="188" fill="#21303a">想找你聊个事</text>
+    <text x="360" y="188" fill="#a9650a" font-weight="700">→</text><text x="400" y="188" fill="#1f5e57" font-weight="700">“周末有空不？方便的时候都行”</text>
+    <rect x="40" y="222" width="600" height="50" rx="12" fill="#fff" stroke="#ffd28a"/>
+    <text x="60" y="246" fill="#a9650a" font-weight="700">被拒</text><text x="150" y="246" fill="#21303a">对方说没空</text>
+    <text x="360" y="246" fill="#a9650a" font-weight="700">→</text><text x="400" y="246" fill="#1f5e57" font-weight="700">“没事没事，我再想想别的办法，谢啦”</text>
+    <text x="40" y="292" font-size="13" fill="#5b6b8c">挑“常·怕·卡”三类场面各写一句，存手机备忘录，遇事掏卡照念，不抓瞎。</text>
+  </g>
+</svg>`;
+
+const ILL_REJECT = `<svg viewBox="0 0 680 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="被拒不崩三步：接住不追加留后路">
+  <rect x="0" y="0" width="680" height="230" rx="14" fill="#f2f8ff"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#1f5e57">第五招 · 被拒不崩（接住 · 不追加 · 留后路）</text>
+  <g font-family="SimSun,serif" font-size="15" text-anchor="middle">
+    <rect x="24" y="56" width="180" height="100" rx="12" fill="#fff" stroke="#ffd0b8"/><text x="114" y="94" fill="#ff7043" font-weight="700" font-size="17">① 接住</text><text x="114" y="120" fill="#5b6b8c">“没事没事”</text><text x="114" y="140" fill="#5b6b8c">笑一下</text>
+    <text x="224" y="110" fill="#1f5e57" font-size="22" font-weight="700">➜</text>
+    <rect x="250" y="56" width="180" height="100" rx="12" fill="#fff" stroke="#bcd9f6"/><text x="340" y="94" fill="#0288d1" font-weight="700" font-size="17">② 不追加</text><text x="340" y="120" fill="#5b6b8c">别补“你忙吧”</text><text x="340" y="140" fill="#5b6b8c">不甩脸子</text>
+    <text x="450" y="110" fill="#1f5e57" font-size="22" font-weight="700">➜</text>
+    <rect x="476" y="56" width="180" height="100" rx="12" fill="#fff" stroke="#c9ecd6"/><text x="566" y="94" fill="#33b679" font-weight="700" font-size="17">③ 留后路</text><text x="566" y="120" fill="#5b6b8c">“谢啦请喝奶茶”</text><text x="566" y="140" fill="#5b6b8c">留住关系</text>
+    <text x="340" y="200" font-size="13" fill="#5b6b8c">被拒≠你不好，是对方真不方便。体面收尾，下次还找得开口。</text>
+  </g>
+</svg>`;
+
+const ILL_ROLE = `<svg viewBox="0 0 680 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="角色扮演三层练·先练被拒">
+  <rect x="0" y="0" width="680" height="230" rx="14" fill="#f2f8ff"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#1f5e57">第六招 · 角色扮演三层练（先练被拒，真场面不慌）</text>
+  <g font-family="SimSun,serif" font-size="15" text-anchor="middle">
+    <rect x="24" y="56" width="180" height="100" rx="12" fill="#fff" stroke="#ffd0b8"/><text x="114" y="94" fill="#ff7043" font-weight="700" font-size="17">① 开口</text><text x="114" y="120" fill="#5b6b8c">缓冲句</text><text x="114" y="140" fill="#5b6b8c">加小忙</text>
+    <text x="224" y="110" fill="#1f5e57" font-size="22" font-weight="700">➜</text>
+    <rect x="250" y="56" width="180" height="100" rx="12" fill="#fff" stroke="#bcd9f6"/><text x="340" y="94" fill="#0288d1" font-weight="700" font-size="17">② 接住</text><text x="340" y="120" fill="#5b6b8c">被拒也笑</text><text x="340" y="140" fill="#5b6b8c">不黑脸</text>
+    <text x="450" y="110" fill="#1f5e57" font-size="22" font-weight="700">➜</text>
+    <rect x="476" y="56" width="180" height="100" rx="12" fill="#fff" stroke="#c9ecd6"/><text x="566" y="94" fill="#33b679" font-weight="700" font-size="17">③ 收尾</text><text x="566" y="120" fill="#5b6b8c">留后路</text><text x="566" y="140" fill="#5b6b8c">体面退</text>
+    <text x="340" y="200" font-size="13" fill="#5b6b8c">练法：朋友演被求的人，你练开口→接住→收尾。没人陪？旧聊天改写三版——脱口版·清楚版，对比哪版最不卑不亢。</text>
+  </g>
+</svg>`;
+
+const ILL_HEROBOOK = `<svg viewBox="0 0 680 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="找榜样+向书学：富兰克林借书化敌为友">
+  <rect x="0" y="0" width="680" height="280" rx="14" fill="#f2f8ff"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#1f5e57">第七招 · 找榜样 + 向书学（偷师怎么求人不卑微）</text>
+  <g font-family="SimSun,serif" font-size="16">
+    <rect x="32" y="48" width="616" height="58" rx="12" fill="#fff" stroke="#ffd0b8"/>
+    <text x="50" y="76" fill="#ff7043" font-weight="700">🎤 榜样</text>
+    <text x="150" y="76" fill="#21303a">何炅请人帮忙先给面子再开口；黄渤跟大腕打交道，从不卑不亢、求教也大方。</text>
+    <text x="50" y="100" font-size="13" fill="#5b6b8c">照着学：先给对方面子，再大大方方开口。</text>
+    <rect x="32" y="120" width="616" height="78" rx="12" fill="#fff" stroke="#c9ecd6"/>
+    <text x="50" y="148" fill="#33b679" font-weight="700">📚 向书学</text>
+    <text x="150" y="148" fill="#1f5e57" font-weight="700">富兰克林借书化敌为友 ——《人性的弱点》原版故事。</text>
+    <text x="150" y="178" fill="#5b6b8c">卡耐基：让人乐意帮你，关键别替对方做决定、别施压；阿伦森《社会心理学》把富兰克林效应当经典。</text>
+    <rect x="32" y="208" width="616" height="50" rx="12" fill="#fff" stroke="#bcd9f6"/>
+    <text x="50" y="238" fill="#0288d1" font-weight="700">✨ 效果</text>
+    <text x="150" y="238" fill="#21303a">看别人怎么开口，等于你先替自己试一遍；没榜样，书里到处是教材。</text>
+  </g>
+</svg>`;
+
+const ILL_MIRROR = `<svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="三问自查镜·求人版">
+  <rect x="0" y="0" width="680" height="300" rx="14" fill="#f2f8ff"/>
+  <text x="340" y="28" text-anchor="middle" font-family="SimSun,serif" font-size="20" font-weight="700" fill="#1f5e57">第八招 · 三问自查镜（求人版，出口前最后照一遍）</text>
+  <ellipse cx="210" cy="165" rx="120" ry="105" fill="#eaf6f2" stroke="#1f5e57" stroke-width="6"/>
+  <ellipse cx="210" cy="165" rx="92" ry="80" fill="#fff" stroke="#bcd9f6"/>
+  <text x="210" y="150" text-anchor="middle" font-family="SimSun,serif" font-size="34" fill="#1f5e57" font-weight="700">?</text>
+  <text x="210" y="190" text-anchor="middle" font-family="SimSun,serif" font-size="22" fill="#33b679" font-weight="700">照镜</text>
+  <g font-family="SimSun,serif" font-size="17">
+    <rect x="370" y="56" width="280" height="60" rx="12" fill="#fff" stroke="#c9ecd6"/>
+    <text x="390" y="84" fill="#33b679" font-weight="700">① 该求吗？</text><text x="510" y="84" fill="#5b6b8c" font-size="14">非求人不可？自己先尽力？</text>
+    <rect x="370" y="128" width="280" height="60" rx="12" fill="#fff" stroke="#c9ecd6"/>
+    <text x="390" y="156" fill="#33b679" font-weight="700">② 方便吗？</text><text x="510" y="156" fill="#5b6b8c" font-size="14">对方方便？小忙不碰钱？</text>
+    <rect x="370" y="200" width="280" height="60" rx="12" fill="#fff" stroke="#c9ecd6"/>
+    <text x="390" y="228" fill="#33b679" font-weight="700">③ 能回报吗？</text><text x="510" y="228" fill="#5b6b8c" font-size="14">帮完怎么还？有来有往？</text>
+  </g>
+  <text x="340" y="288" text-anchor="middle" font-size="13" fill="#5b6b8c">三问过一遍，配合手放桌上、舌尖抵上颚，求人的话才体面出口。</text>
+</svg>`;
+
+/* ===== 课程步骤（sub=字幕；id=音频文件名；svg=案例图） ===== */
+const STEPS = [
+  {id:"t01",sp:"teacher",sub:"同学们好，我是晓晓老师。昨天第12关我们练了开口前在脑子里打草稿——先排好再出口。今天第13关，换个让人手心出汗的场面：找人帮忙。很多同学一开口就犯难：怕欠人情、怕被拒、怕显得怂。今天教你怎么求人帮忙不卑不亢——把话说到对方心坎上，对方还乐意帮。开头先把第12关的草稿法用上，再学新招。"},
+  {id:"t02",sp:"student",sub:"老师，找人帮忙我最怕了！总怕人家不乐意，还怕欠人情以后还不清。"},
+  {id:"t03",sp:"teacher",sub:"小明你这怕，太真实了。今天总口诀：求人帮忙别慌张，先排草稿再开腔。欠人情，换机会，富兰克林借书化敌强。缓冲一句铺台阶，话别说满留退路。场景预设先写好，角色扮演练被拒。找榜样，向书学，三问自查不卑亢。该求吗，方便吗，能回报，照镜下。",svg:ILL_OVERVIEW},
+  {id:"t04",sp:"teacher",sub:"先懂原理：为什么怕求人是个误会。心理学有个反直觉的发现，叫富兰克林效应——帮过你忙的人，比被你帮过的人，更愿意再帮你。故事：1736年，富兰克林在议会当差，有个议员处处跟他作对。富兰克林没讨好也没硬刚，听说那人藏了本珍贵书，就写信去借。那人借了，富兰克林按时还书又写了谢条。后来两人再见面，那议员主动打招呼、说话客气，还成了好朋友。这事儿写进了卡耐基的人性的弱点，阿伦森的社会心理学也当经典。2015年研究还说：求助本身传达你想跟人好好相处，对方帮了你反而更喜欢你。所以找人帮忙，不是欠人情，是给人家一个帮你的机会。",svg:ILL_WHY},
+  {id:"t05",sp:"student",sub:"老师，这听着反着来啊！我求人，人家反而更喜欢我？"},
+  {id:"t06",sp:"teacher",sub:"第一招，把欠人情换成给机会——求小忙不卑微。求人最怕一开口就大动作：张口借钱、要人跑远路。正确做法：求举手之劳的小忙，借支笔、问个作业；不开口就碰钱、碰人难处；事后一定有来有往，有借有还再借不难。小忙像递块糖，对方顺手帮了还觉得你懂事；大忙像搬座山，谁都皱眉。口诀：求小不碰钱，事后必有还。",svg:ILL_MINDSET},
+  {id:"t07",sp:"student",sub:"老师，那具体怎么开口，才不让对方为难？"},
+  {id:"t08",sp:"teacher",sub:"第二招，万能缓冲句，先铺台阶再开口。别冷不丁甩一句帮我个忙。三类：不确定对方忙不忙，说不耽误你吧，方便的时候能不能；接不上话，说这个角度我还真没想过，你接着说；怕太突兀，说有个小事想请教你，不知方不方便。缓冲句不是怂，是先替对方想一步——他正忙也有台阶下。你把我要你帮，说成想请教你，对方听着舒服也更愿意接。",svg:ILL_BUF},
+  {id:"t09",sp:"teacher",sub:"第三招，话别说满——不替对方做决定。求人最容易翻车的一句：你肯定帮我的是吧，你一定行的。这等于替人家拍了板，对方压力大反而不想帮。把肯定、必须、一定圈掉，换成可能、也许、不知道能不能。冒失说你肯定借我笔记对吧，把人架火上烤；清楚说，我笔记落在教室了，不知道你方不方便借我拍一下，不方便也没事。把一定说成也许，对方帮得心甘情愿。口诀：把一定说成也许，把肯定说成可能。",svg:ILL_NOSAY},
+  {id:"t10",sp:"student",sub:"老师，我怕被拒绝，张不开嘴。"},
+  {id:"t11",sp:"teacher",sub:"第四招，场景预设卡——常要开口的三类帮忙提前写好。借东西：我某某落在教室了，不知方不方便借我拍一下，不方便也没事；问作业：这道题我没太懂，想请教你一下，不耽误你吧；约时间：周末有空不，想找你聊个事，方便的时候都行。挑常、怕、卡三类场面各写一句，存手机，遇事掏卡照念不抓瞎。",svg:ILL_CARD},
+  {id:"t12",sp:"student",sub:"老师，真被拒了怎么办，好丢人。"},
+  {id:"t13",sp:"teacher",sub:"第五招，被拒不崩——接住，不追加不解释。真被拒了最忌两样：当场黑脸，或拼命解释我真的没办法才找你。记住三步：接住，说没事没事那我再想想别的办法，笑一下；不追加，别补一句你忙吧甩脸子；留后路，说谢啦回头请你喝奶茶，把关系留住。被拒不等于你不好，是对方真不方便。体面收尾，下次还找得开口。",svg:ILL_REJECT},
+  {id:"t14",sp:"student",sub:"老师，我身边没人陪我练怎么开口。"},
+  {id:"t15",sp:"teacher",sub:"第六招，角色扮演三层练——先练被拒，真场面不慌。找朋友模拟：他演被求的人，你练开口、接住、收尾。三层：开口，缓冲句加小忙；接住，被拒也笑；收尾，留后路。没人陪？拿聊天记录改写三版——脱口版你借我笔记呗肯定行、清楚版我笔记落了不知方不方便拍一下不方便也没事，对比哪版最不卑不亢。练熟了真开口就不抖。",svg:ILL_ROLE},
+  {id:"t16",sp:"teacher",sub:"第七招，找榜样加向书学——偷师怎么求人不卑微。没榜样，看谁求人让人舒服：何炅帮人圆场、请人帮忙，永远先给面子再开口；黄渤跟大腕打交道，从不卑不亢，求教也大大方方。书里更有干货：富兰克林借书化敌为友，人性的弱点原版故事；卡耐基说让人乐意帮你，关键别替对方做决定别施压；阿伦森社会心理学把富兰克林效应当经典。看别人怎么开口，等于你先替自己试一遍。",svg:ILL_HEROBOOK},
+  {id:"t17",sp:"teacher",sub:"第八招，三问自查镜，求人版，出口前最后照一遍：该求吗，这事非求人不可，自己先尽力了？方便吗，对方现在方便，是小忙不碰钱？能回报吗，帮完我怎么还，有来有往？三问过一遍，配合手放桌上、舌尖抵上颚，求人的话才体面出口。",svg:ILL_MIRROR},
+  {id:"t18",sp:"teacher",sub:"再送你个睡前小妙招：数今天我不敢求人错过了啥。睡前五分钟回想今天——哪件事我硬扛，其实张嘴求人更好？下次怎么开口？把不敢求变会求，攒成经验。口诀：睡前五分钟，数数不敢求。"},
+
+  {id:"t19",sp:"teacher",sub:"好，晓晓老师抽查第一题：想找同学借笔记拍一下，最体面的是？A，你肯定借我笔记对吧；B，我笔记落教室了，不知方不方便拍一下，不方便也没事；C，你不借我以后别找我。想好了再选哦。",type:"quiz",
+    q:"想找同学借笔记拍一下，最体面的是？",
+    opts:["“你肯定借我笔记对吧？”","“我笔记落教室了，不知方不方便拍一下，不方便也没事。”","“你不借我以后别找我。”"],
+    ans:1, exp:"B 缓冲句铺台阶+话别说满（不方便也没事），对方帮得心甘情愿；A 替人做决定施压，C 威胁伤关系。"},
+  {id:"t20",sp:"teacher",sub:"第二题：对方说不好意思我这会儿真没空，最稳的是？A，你忙吧（甩脸子）；B，没事没事那我再想想别的办法谢啦；C，一直解释我真的没办法才找你。想好了再选。",type:"quiz",
+    q:"对方说“不好意思我这会儿真没空”，最稳的是？",
+    opts:["“你忙吧”（甩脸子）","“没事没事，那我再想想别的办法，谢啦。”","一直解释“我真的没办法才找你”"],
+    ans:1, exp:"B 接住+留后路，体面收尾；A 冷处理伤关系，C 越描越黑。"},
+
+  {id:"t21",sp:"teacher",sub:"应用题来啦，小明。你数学题不会，想请教班里学霸。请用今天学的缓冲句、话别说满、小忙，打草稿写一句你会怎么开口，不卑不亢。写下来或者大声说出来都可以。",type:"feynman",
+    q:"应用题：你数学题不会，想请教班里学霸。请用「缓冲句 + 话别说满 + 小忙」打草稿，写一句你会怎么开口（不卑不亢）。",
+    ref:"参考：先缓冲——「不耽误你吧？」；再开口——「这道大题我没太懂，想请教你一下，方便的时候教我两分钟就行，不方便也没事。」不替对方拍板、不碰大忙，体面又让人乐意帮。"},
+  {id:"t22",sp:"teacher",sub:"最后是费曼复述挑战：假装你是老师，用自己的话讲一遍——为什么怕求人是个误会，富兰克林效应？怎么用缓冲句、话别说满、场景预设、角色扮演、找榜样向书学、三问自查，做到求人帮忙不卑不亢？讲不明白就是没真懂，多讲两遍就通了。",type:"feynman",
+    q:"费曼复述：用你自己的话，讲一遍——为什么「怕求人」是个误会（富兰克林效应）？怎么用缓冲句、话别说满、场景预设、角色扮演、找榜样向书学、三问自查，做到「求人帮忙不卑不亢」？写下来或说给家人听。",
+    ref:"参考：富兰克林借书给政敌，对方反而成了朋友——帮过你忙的人更愿意再帮你，所以求人是给机会不是欠人情。做法：求小忙不碰钱、事后有还；开口先缓冲句铺台阶（不耽误你吧 / 这个角度我还真没想过你接着说）；不替对方做决定，把一定换成也许；提前写场景卡；找朋友模拟被拒不慌；学富兰克林/卡耐基/阿伦森；出口前照三问（该求吗/方便吗/能回报吗）。会求人，也是一种体面。"},
+
+  {id:"t23",sp:"student",sub:"老师我懂了！以后求人先想三秒打草稿，开口用缓冲句铺台阶，把一定换成也许，被拒也笑说没事，出口前还照三问！"},
+  {id:"t24",sp:"teacher",sub:"太棒了小明！记住：会求人不是怂，是给彼此一个靠近的机会。把你一定帮换成不方便也没事，对方帮得舒服，你也站得体面。今天第13关过了，明天见下一关！"},
+];
+
+/* ===== 不定时随机抽查题库（自动连播时会在某一句后突然弹出） ===== */
+const BONUS_POOL = [
+  {q:"（突击）想借同学笔记拍一下，最体面？",opts:["你肯定借我笔记对吧","我笔记落了，不知方不方便拍一下，不方便也没事","你不借我以后别找我"],ans:1,
+   exp:"B 缓冲+话别说满，对方帮得心甘情愿；A 施压，C 伤关系。"},
+  {q:"（突击）怕求人显得怂，其实？",opts:["求人是欠人情","求小忙是给人家帮你的机会","能不求是本事"],ans:1,
+   exp:"B 富兰克林效应：帮过你忙的人更愿意再帮你，求小忙是给机会不是欠人情。"},
+  {q:"（突击）对方说没空，最稳？",opts:["你忙吧（甩脸）","没事没事我再想别的办法，谢啦","一直解释我没办法才找你"],ans:1,
+   exp:"B 接住+留后路体面收尾；A 冷处理，C 越描越黑。"},
+];
+const NARR_IDX = STEPS.map((s,i)=>i).filter(i=>!STEPS[i].type);
+const bonusPos = NARR_IDX[Math.floor(Math.random()*(NARR_IDX.length-6))+3];
+const bonusQ = BONUS_POOL[Math.floor(Math.random()*BONUS_POOL.length)];
+
+/* ===== 元素 ===== */
+const stage=document.getElementById('stage'), capTxt=document.getElementById('capTxt'), capWho=document.getElementById('capWho');
+const bar=document.getElementById('bar'), pct=document.getElementById('pct'), scoreEl=document.getElementById('score');
+const playBtn=document.getElementById('playBtn'), prevBtn=document.getElementById('prevBtn'), nextBtn=document.getElementById('nextBtn');
+const autoChk=document.getElementById('autoChk'), capChk=document.getElementById('capChk'), rateSel=document.getElementById('rateSel');
+const seek=document.getElementById('seek'), curTime=document.getElementById('curTime'), durTime=document.getElementById('durTime');
+const back5=document.getElementById('back5'), fwd5=document.getElementById('fwd5');
+
+let cur=-1, score=0, audio=new Audio(), playing=false, autoTimer=null, bonusUsed=false, seeking=false;
+
+function fmt(t){ if(!isFinite(t)||t<0)t=0; const m=Math.floor(t/60), s=Math.floor(t%60); return m+':'+(s<10?'0':'')+s; }
+function setLessonProg(){ const p=Math.round((cur+1)/STEPS.length*100); bar.style.width=p+'%'; pct.textContent=p+'%'; }
+function setCap(sp,txt){ if(!capChk.checked){capTxt.textContent='（字幕已关闭）';capWho.textContent='字幕';return;} capWho.textContent=sp==='teacher'?'晓晓老师':'小明同学'; capTxt.textContent=txt; }
+function clearStage(){ stage.innerHTML=''; document.getElementById('stageHint')?.remove(); }
+function paintSeek(){ const v=(+seek.value)/1000*100; seek.style.background=`linear-gradient(90deg,#2e9e8a ${v}%, #e6ecf5 ${v}%)`; }
+
+function renderStep(i,isBonus=false){
+  clearStage();
+  if(isBonus){ renderQuiz(bonusQ,()=>advance(),true); setCap('teacher','（不定时抽查）'+bonusQ.q); return; }
+  const s=STEPS[i];
+  const row=document.createElement('div'); row.className='row '+(s.sp==='student'?'student':'');
+  const av=document.createElement('div'); av.className='avatar '+(s.sp==='student'?'student':'teacher'); av.textContent=s.sp==='student'?'明':'晓';
+  const col=document.createElement('div');
+  const name=document.createElement('div'); name.className='name'; name.textContent=s.sp==='student'?'小明同学':'晓晓老师';
+  const bub=document.createElement('div'); bub.className='bubble'; bub.textContent=s.sub;
+  col.appendChild(name); col.appendChild(bub); row.appendChild(av); row.appendChild(col); stage.appendChild(row);
+  if(s.svg){
+    const illu=document.createElement('div'); illu.className='illu';
+    illu.innerHTML=s.svg;
+    stage.appendChild(illu);
+  }
+  setCap(s.sp,s.sub);
+  if(s.type==='quiz'){ renderQuiz(s,()=>afterNarration(i)); }
+  else if(s.type==='feynman'){ renderFeynman(s,()=>afterNarration(i)); }
+  setLessonProg();
+  prevBtn.disabled=(i<=0); nextBtn.disabled=(i>=STEPS.length-1);
+}
+function renderQuiz(q,onDone,isBonus){
+  const box=document.createElement('div'); box.className='quiz';
+  box.innerHTML='<h3>📝 '+(isBonus?'不定时突击抽查':'晓晓老师抽查')+'</h3>';
+  const h=document.createElement('div'); h.style.cssText='font-size:17px;line-height:1.8;margin-bottom:6px;font-family:var(--read-font)'; h.textContent=q.q; box.appendChild(h);
+  q.opts.forEach((o,idx)=>{
+    const b=document.createElement('button'); b.className='opt'; b.textContent=o;
+    b.onclick=()=>{
+      box.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+      if(idx===q.ans){ b.classList.add('correct'); addScore(10); } else { b.classList.add('wrong'); box.querySelectorAll('.opt')[q.ans].classList.add('correct'); }
+      const e=document.createElement('div'); e.className='explain show'; e.textContent='💡 '+q.exp; box.appendChild(e);
+      const nb=document.createElement('button'); nb.className='btn primary mini'; nb.textContent='继续 ▶'; nb.style.marginTop='10px'; nb.onclick=()=>onDone(); box.appendChild(nb);
+    };
+    box.appendChild(b);
+  });
+  stage.appendChild(box);
+}
+function renderFeynman(s,onDone){
+  const box=document.createElement('div'); box.className='feynman';
+  box.innerHTML='<h3>🎤 '+(s.q.indexOf('费曼')>=0?'费曼复述挑战':'应用挑战')+'</h3>';
+  const p=document.createElement('div'); p.style.cssText='font-size:17px;line-height:1.8;margin-bottom:8px;font-family:var(--read-font)'; p.textContent=s.q; box.appendChild(p);
+  const ta=document.createElement('textarea'); ta.placeholder='用自己的话写下来，或大声说出来后点下面的按钮…'; box.appendChild(ta);
+  const rb=document.createElement('button'); rb.className='btn mini'; rb.textContent='👀 看参考答案';
+  const ref=document.createElement('div'); ref.className='ref'; ref.textContent=s.ref; rb.onclick=()=>ref.classList.add('show');
+  const nb=document.createElement('button'); nb.className='btn primary mini'; nb.textContent='我已复述，继续 ▶'; nb.style.marginLeft='8px'; nb.onclick=()=>{ addScore(5); onDone(); };
+  const wrap=document.createElement('div'); wrap.style.marginTop='10px'; wrap.appendChild(rb); wrap.appendChild(nb); box.appendChild(wrap); box.appendChild(ref);
+  stage.appendChild(box);
+}
+function addScore(n){ score+=n; scoreEl.textContent=score; }
+
+/* ===== 音频引擎 ===== */
+function loadAndPlay(i){
+  playing=true; playBtn.textContent='⏸ 暂停';
+  audio.src='audio_d0724/'+STEPS[i].id+'.mp3';
+  audio.playbackRate=parseFloat(rateSel.value);
+  audio.play().catch(()=>{ playBtn.textContent='▶ 播放'; });
+}
+audio.addEventListener('loadedmetadata',()=>{ durTime.textContent=fmt(audio.duration); });
+audio.addEventListener('timeupdate',()=>{
+  if(seeking) return;
+  curTime.textContent=fmt(audio.currentTime);
+  if(audio.duration){ seek.value=Math.round(audio.currentTime/audio.duration*1000); paintSeek(); }
+});
+audio.addEventListener('ended',()=>{
+  playing=false; playBtn.textContent='▶ 重播这句';
+  const i=cur;
+  if(autoChk.checked && !STEPS[i].type){
+    if(!bonusUsed && i===bonusPos){ bonusUsed=true; setTimeout(()=>renderStep(i,true),400); return; }
+    autoTimer=setTimeout(()=>advance(),450);
+  }
+});
+/* 拖动进度条：随意调播放位置 */
+seek.addEventListener('input',()=>{ seeking=true; paintSeek(); if(audio.duration){ curTime.textContent=fmt((+seek.value)/1000*audio.duration); } });
+seek.addEventListener('change',()=>{ if(audio.duration){ audio.currentTime=(+seek.value)/1000*audio.duration; } seeking=false; });
+back5.onclick=()=>{ audio.currentTime=Math.max(0,audio.currentTime-5); };
+fwd5.onclick=()=>{ if(audio.duration) audio.currentTime=Math.min(audio.duration,audio.currentTime+5); };
+rateSel.onchange=()=>{ audio.playbackRate=parseFloat(rateSel.value); };
+
+function advance(){ if(cur>=STEPS.length-1){ finish(); return; }
+  cur++; renderStep(cur); loadAndPlay(cur); }
+function afterNarration(i){ if(autoChk.checked){ autoTimer=setTimeout(()=>advance(),400); } }
+function goStep(i){ cur=i; renderStep(cur); loadAndPlay(cur); }
+function resetSeek(){ audio.pause(); seek.value=0; paintSeek(); curTime.textContent='0:00'; durTime.textContent='0:00'; playing=false; playBtn.textContent='▶ 播放'; }
+
+function finish(){
+  clearStage(); resetSeek();
+  document.getElementById('endOverlay').classList.remove('hidden');
+  document.getElementById('endMsg').innerHTML='你练完了「求人帮忙不卑不亢——开口前把话说到对方心坎上」这一关，本次得分 ⭐ <b>'+score+'</b>。真正学会的标志：<b>下次张嘴求人前，舌尖抵上颚、手放桌上默念三秒打草稿——先用富兰克林效应解开“怕欠人情”（帮过你忙的人更愿意再帮你，求人是给机会不是欠人情）；开口用缓冲句铺台阶（如“不耽误你吧”“这个角度我还真没想过，你接着说”），把“一定/肯定”换成“也许/可能”不把话替对方说死；常求的三类帮忙提前写场景卡；被拒不崩（接住·不追加·留后路）；出口前照三问（该求吗/方便吗/能回报吗）。</b>';
+  document.getElementById('endCards').innerHTML=`
+    <div class="kcard"><b>① 原理</b><br>富兰克林效应<br>帮过你忙更愿帮</div>
+    <div class="kcard"><b>② 欠→给</b><br>求小忙<br>不碰钱·事后还</div>
+    <div class="kcard"><b>③ 缓冲句</b><br>不耽误你吧<br>这角度真没想过</div>
+    <div class="kcard"><b>④ 话别说满</b><br>一定→也许<br>不方便也没事</div>
+    <div class="kcard"><b>⑤ 场景卡</b><br>借物·问作业<br>约时间</div>
+    <div class="kcard"><b>⑥ 被拒不崩</b><br>接住·不追加<br>留后路</div>
+    <div class="kcard"><b>⑦ 角色扮演</b><br>开口·接住<br>收尾</div>
+    <div class="kcard"><b>⑧ 找榜样+向书学</b><br>富兰克林<br>卡耐基·阿伦森</div>
+    <div class="kcard"><b>⑨ 三问自查镜</b><br>该求吗·方便吗<br>能回报吗</div>
+    <div class="kcard"><b>⑩ 睡前小妙招</b><br>数今天<br>不敢求</div>`;
+  bar.style.width='100%'; pct.textContent='100%';
+}
+
+/* 控件 */
+playBtn.onclick=()=>{
+  if(cur<0){ advance(); return; }
+  if(playing){ audio.pause(); playing=false; playBtn.textContent='▶ 继续'; }
+  else { playing=true; playBtn.textContent='⏸ 暂停'; audio.play().catch(()=>{}); }
+};
+nextBtn.onclick=()=>{ if(cur<STEPS.length-1){ clearTimeout(autoTimer); advance(); } };
+prevBtn.onclick=()=>{ if(cur>0){ clearTimeout(autoTimer); goStep(cur-1); } };
+document.getElementById('startBtn').onclick=()=>{ document.getElementById('introOverlay').classList.add('hidden'); advance(); };
+document.getElementById('replayBtn').onclick=()=>{ document.getElementById('endOverlay').classList.add('hidden'); cur=-1; score=0; scoreEl.textContent=0; bonusUsed=false; advance(); };
+capChk.onchange=()=>{ if(cur>=0 && STEPS[cur]) setCap(STEPS[cur].sp,STEPS[cur].sub); };
+paintSeek();
+</script>
+</body>
+</html>
